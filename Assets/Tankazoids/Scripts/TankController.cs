@@ -89,7 +89,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
             }
         }
 
-        [ServerRpc]
+        [ServerRpc(RunLocally = true)]
         private void Shoot(NetworkObject nob)
         {
             ServerManager.Spawn(nob);
