@@ -181,9 +181,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73f05363cbf674b408e32a7e36f9b0f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 9117857247562382210}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 9117857247562382210}
 --- !u!1 &9117857247562382221
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,7 +238,7 @@ MonoBehaviour:
   - {fileID: 264791952884968468}
   - {fileID: 1012129365208062032}
   - {fileID: 6612242228950063909}
-  - {fileID: 0}
+  - {fileID: 3552398818375890023}
   SceneTransformProperties:
     Position: {x: 0, y: 1, z: -10}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -246,7 +246,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 27
+  _prefabId: 4
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects:
@@ -364,4 +364,4 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 9117857247562382210}
   _moveRate: 5
   _turnRate: 90
-  _bullet: {fileID: 7837574795933001230, guid: a669966a36ee8ae4bb501da45744957e, type: 3}
+  _bullet: {fileID: 5768976693893420239, guid: a669966a36ee8ae4bb501da45744957e, type: 3}

@@ -1,4 +1,5 @@
 ﻿using FishNet;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
@@ -40,7 +41,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
         [SerializeField]
         private float _turnRate = 5f;
         [SerializeField]
-        private NetworkObject _bullet;
+        private GameObject _bullet;
         #endregion
 
         #region Private.
@@ -76,8 +77,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
                 CheckInput(out InputData id);
                 if (id.IsShooting)
                 {
-                    NetworkObject nob = Instantiate(_bullet, transform.position + (transform.forward * 1), transform.rotation);
-                    Shoot(nob);
+                    Shoot(base.LocalConnection);
                 }
                 Move(id, false);
             }
@@ -89,10 +89,11 @@ namespace FishNet.Example.Prediction.CharacterControllers
             }
         }
 
-        [ServerRpc(RunLocally = true)]
-        private void Shoot(NetworkObject nob)
+        [ServerRpc]
+        private void Shoot(NetworkConnection conn)
         {
-            ServerManager.Spawn(nob);
+            GameObject gob = Instantiate(_bullet, transform.position + (transform.forward * 1), transform.rotation);
+            Spawn(gob, conn);
         }
 
         private void CheckInput(out InputData id)
