@@ -363,4 +363,5 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 9117857247562382210}
   _networkObjectCache: {fileID: 9117857247562382210}
   _moveRate: 5
-  _turnRate: 45
+  _turnRate: 90
+  _bullet: {fileID: 7837574795933001230, guid: a669966a36ee8ae4bb501da45744957e, type: 3}

@@ -1450,7 +1450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _unreliableMTU: 1023
   _attackResponseType: 1
-  _ipv4BindAddress: 127.0.0.1
+  _ipv4BindAddress: 
   _ipv6BindAddress: 
   _port: 25565
   _maximumClients: 4095
