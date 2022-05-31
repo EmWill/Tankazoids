@@ -77,7 +77,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
                 if (id.IsShooting)
                 {
                     NetworkObject nob = Instantiate(_bullet, transform.position + (transform.forward * 1), transform.rotation);
-                    ServerManager.Spawn(nob);
+                    Shoot(nob);
                 }
                 Move(id, false);
             }
@@ -87,6 +87,12 @@ namespace FishNet.Example.Prediction.CharacterControllers
                 ReconcileData rd = new ReconcileData(transform.position, transform.rotation);
                 Reconciliation(rd, true);
             }
+        }
+
+        [ServerRpc]
+        private void Shoot(NetworkObject nob)
+        {
+            ServerManager.Spawn(nob);
         }
 
         private void CheckInput(out InputData id)
