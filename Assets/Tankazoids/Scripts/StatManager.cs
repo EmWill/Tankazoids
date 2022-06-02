@@ -14,6 +14,7 @@ public class StatManager<T>
     {
         _statModifiers = new List<StatModifier<T>>();
         _baseStat = baseStat;
+        Value = _baseStat;
     }
 
     public void AddStatModifier(StatModifier<T> mod)

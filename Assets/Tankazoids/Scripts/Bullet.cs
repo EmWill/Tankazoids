@@ -5,14 +5,15 @@ using UnityEngine;
 
 public class Bullet : NetworkBehaviour
 {
-    public float Damage { get; set; }
-    public float Speed { get; set; }
+    public readonly StatManager<float> Damage;
+    public readonly StatManager<float> Speed;
+    public readonly Tank Shooter;
 
-    private void Awake()
-    {
-        Damage = 10;
-        Speed = 500;
-        Rigidbody rb = GetComponent<Rigidbody>();
-        rb.AddForce(transform.forward * Speed);
-    }
+    public delegate void OnFiredHandler();
+    public event OnFiredHandler OnFired;
+
+    public delegate void OnHitHandler(Tank hitee);
+    public event OnHitHandler OnHit;
+
+    
 }
