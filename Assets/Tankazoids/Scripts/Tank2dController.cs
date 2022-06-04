@@ -54,14 +54,18 @@ namespace FishNet.Example.Prediction.CharacterControllers
         #endregion
 
         #region Private.
+        public Transform _camera;
         private Rigidbody2D _rigidbody2D;
         private Vector3 _velocity = Vector3.zero;
+        private bool _reverse = false;
         private float _angularVelocity = 0f;
+        private bool _moving = false;
         #endregion
 
 
         private void Awake()
         {
+            _camera = transform.GetChild(0);
             InstanceFinder.TimeManager.OnTick += TimeManager_OnTick;
             _rigidbody2D = GetComponent<Rigidbody2D>();
         }
@@ -123,12 +127,54 @@ namespace FishNet.Example.Prediction.CharacterControllers
         [Replicate]
         private void Move(InputData md, bool asServer, bool replaying = false)
         {
-            Vector3 targetVelocity = transform.up * md.Vertical * _moveRate;
 
             _rigidbody2D.velocity = Vector3.SmoothDamp(_rigidbody2D.velocity, targetVelocity, ref _velocity, _accelerationSmoothing);
 
             float targetAngularVelocity = -md.Horizontal * _moveRate * _turnRate;
             _rigidbody2D.angularVelocity = Mathf.SmoothDamp(_rigidbody2D.angularVelocity, targetAngularVelocity, ref _angularVelocity, _angularAccelerationSmoothing);
+            Vector2 newDirection = new Vector2(md.Horizontal, md.Vertical);
+            float motion = newDirection.magnitude;
+            float bowAngle = Vector2.SignedAngle(transform.up, newDirection);
+            float sternAngle = Vector2.SignedAngle(-transform.up, newDirection);
+            float angle = bowAngle;
+            if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && !_moving) {
+                angle = sternAngle;
+                _reverse = true;
+            }
+            else if (!_moving)
+            {
+                angle = bowAngle;
+                _reverse = false;
+            }
+            if (_reverse)
+                angle = sternAngle;
+            if (angle != 0)
+            {
+                if (angle > 0f)
+                    angle = 1;
+                else
+                    angle = -1; 
+                if (angle != 0)
+                    transform.Rotate(0, 0, angle * _turnRate * (float)base.TimeManager.TickDelta);
+            }
+            if (!_reverse)
+            {
+                _rigidbody2D.MovePosition(transform.position + transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta);
+            }
+            else
+            {
+                _rigidbody2D.MovePosition(transform.position - transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta);
+            }
+            if (motion > 0)
+            {
+                _moving = true;
+            }
+            else
+            {
+                _moving = false;
+            }
+
+
         }
 
         [Reconcile]
@@ -139,6 +185,8 @@ namespace FishNet.Example.Prediction.CharacterControllers
 
             // transform.position = rd.Position;
             // transform.rotation = rd.Rotation;
+            transform.position = rd.Position;
+            transform.rotation = rd.Rotation;
         }
 
 
