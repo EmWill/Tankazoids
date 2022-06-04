@@ -127,11 +127,6 @@ namespace FishNet.Example.Prediction.CharacterControllers
         [Replicate]
         private void Move(InputData md, bool asServer, bool replaying = false)
         {
-
-            _rigidbody2D.velocity = Vector3.SmoothDamp(_rigidbody2D.velocity, targetVelocity, ref _velocity, _accelerationSmoothing);
-
-            float targetAngularVelocity = -md.Horizontal * _moveRate * _turnRate;
-            _rigidbody2D.angularVelocity = Mathf.SmoothDamp(_rigidbody2D.angularVelocity, targetAngularVelocity, ref _angularVelocity, _angularAccelerationSmoothing);
             Vector2 newDirection = new Vector2(md.Horizontal, md.Vertical);
             float motion = newDirection.magnitude;
             float bowAngle = Vector2.SignedAngle(transform.up, newDirection);
