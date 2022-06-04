@@ -92,7 +92,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
         [ServerRpc]
         private void Shoot(NetworkConnection conn)
         {
-            GameObject gob = Instantiate(_bullet, transform.position + (transform.forward * 1), transform.rotation);
+            GameObject gob = Instantiate(_bullet, transform.position + (transform.forward * 1.5f), transform.rotation);
             Spawn(gob, conn);
         }
 

@@ -2,6 +2,7 @@
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using System.Collections;
 using UnityEngine;
 
 /*
@@ -12,7 +13,6 @@ using UnityEngine;
 
 namespace FishNet.Example.Prediction.CharacterControllers
 {
-
     public class Tank2dController : NetworkBehaviour
     {
         #region Types.
@@ -60,11 +60,15 @@ namespace FishNet.Example.Prediction.CharacterControllers
         private bool _reverse = false;
         private float _angularVelocity = 0f;
         private bool _moving = false;
+        private Tank _tank;
+        private float _canFireAt;
         #endregion
 
 
         private void Awake()
         {
+            _canFireAt = Time.time;
+            _tank = gameObject.GetComponent<Tank>();
             _camera = transform.GetChild(0);
             InstanceFinder.TimeManager.OnTick += TimeManager_OnTick;
             _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -104,11 +108,25 @@ namespace FishNet.Example.Prediction.CharacterControllers
             }
         }
 
-        [ServerRpc]
+        [ServerRpc(RunLocally = true)]
         private void Shoot(NetworkConnection conn)
         {
-            GameObject gob = Instantiate(_bullet, transform.position + (transform.forward * 1), transform.rotation);
-            Spawn(gob, conn);
+            if (_canFireAt <= Time.time)
+            {
+                Vector3 spawnPos = transform.up * 2 + transform.position;
+                GameObject gob = Instantiate(_bullet, spawnPos, transform.rotation);
+                Bullet b = gob.GetComponent<Bullet>();
+                b.Damage = 10f;
+                b.Speed = 200f;
+                Spawn(gob, conn);
+                Vector3 aim = Input.mousePosition;
+                aim.z = -Camera.main.transform.position.z;
+                aim = Camera.main.ScreenToWorldPoint(aim);
+                aim.z = 0;
+                aim = aim - spawnPos;
+                b.Shoot(aim.normalized);
+                _canFireAt = Time.time + _tank.RateOfFire.Value;
+            }
         }
 
         private void CheckInput(out InputData id)
@@ -183,9 +201,6 @@ namespace FishNet.Example.Prediction.CharacterControllers
             transform.position = rd.Position;
             transform.rotation = rd.Rotation;
         }
-
-
     }
-
 
 }

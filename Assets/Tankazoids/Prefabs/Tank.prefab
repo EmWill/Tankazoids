@@ -346,8 +346,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 0}
+  _addedNetworkObject: {fileID: 9117857247562382210}
   _networkObjectCache: {fileID: 0}
   _moveRate: 5
   _turnRate: 5
-  _bullet: {fileID: 0}
+  _bullet: {fileID: 5768976693893420239, guid: a669966a36ee8ae4bb501da45744957e, type: 3}
