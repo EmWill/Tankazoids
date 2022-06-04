@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: a9efc2d2ce6377f4fa7e552f34388770
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

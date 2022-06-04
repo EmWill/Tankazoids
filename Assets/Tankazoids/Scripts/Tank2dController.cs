@@ -145,12 +145,13 @@ namespace FishNet.Example.Prediction.CharacterControllers
         [Replicate]
         private void Move(InputData md, bool asServer, bool replaying = false)
         {
-            Vector2 newDirection = new Vector2(md.Horizontal, md.Vertical);
-            float motion = newDirection.magnitude;
+            Vector2 newDirection = new Vector2(md.Horizontal, md.Vertical).normalized;
+            float motion = Mathf.Min(newDirection.magnitude, 1f);
             float bowAngle = Vector2.SignedAngle(transform.up, newDirection);
             float sternAngle = Vector2.SignedAngle(-transform.up, newDirection);
             float angle = bowAngle;
-            if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && !_moving) {
+            if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && !_moving)
+            {
                 angle = sternAngle;
                 _reverse = true;
             }
@@ -163,12 +164,16 @@ namespace FishNet.Example.Prediction.CharacterControllers
                 angle = sternAngle;
             if (angle != 0)
             {
+                float direction;
                 if (angle > 0f)
-                    angle = 1;
+                    direction = 1;
                 else
-                    angle = -1; 
+                    direction = -1;
                 if (angle != 0)
-                    transform.Rotate(0, 0, angle * _turnRate * (float)base.TimeManager.TickDelta);
+                {
+                    float rotationDistance = Mathf.Min(Mathf.Abs(angle), _turnRate * (float)base.TimeManager.TickDelta);
+                    transform.Rotate(0, 0, direction * rotationDistance);
+                }
             }
             if (!_reverse)
             {
@@ -186,8 +191,6 @@ namespace FishNet.Example.Prediction.CharacterControllers
             {
                 _moving = false;
             }
-
-
         }
 
         [Reconcile]
