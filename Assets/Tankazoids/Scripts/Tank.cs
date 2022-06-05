@@ -104,9 +104,12 @@ public class Tank : NetworkBehaviour
 
         Debug.Log("client moment");
 
-        EquipWeapon0(defaultWeapon0Prefab);
-        EquipBody(defaultBodyPrefab);
-        EquipTread(defaultTreadPrefab);
+        if (base.IsOwner)
+        {
+            EquipWeapon0(defaultWeapon0Prefab);
+            EquipBody(defaultBodyPrefab);
+            EquipTread(defaultTreadPrefab);
+        }
     }
 
     private void OnTick()
@@ -127,6 +130,12 @@ public class Tank : NetworkBehaviour
 
     private InputData GetInputData()
     {
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+
+        if (horizontal == 0f && vertical == 0f)
+            return default;
+
         return new InputData(
                 Input.GetAxisRaw("Horizontal"),
                 Input.GetAxisRaw("Vertical"),
@@ -169,9 +178,8 @@ public class Tank : NetworkBehaviour
 
 
         _weapon0Object = Instantiate(prefab, weaponContainer.transform);
-        base.Spawn(_weapon0Object, base.Owner);
+        InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner);
 
-        _weapon0Component = _weapon0Object.GetComponent<AbstractWeapon>();
         Debug.Log("weapon");
         UpdateClientWeapon0(base.Owner, _weapon0Object, _weapon0Component);
 
@@ -198,7 +206,7 @@ public class Tank : NetworkBehaviour
         NetworkBehaviour oldBodyComponent = _bodyComponent;
 
         _bodyObject = Instantiate(prefab, bodyContainer.transform);
-        base.Spawn(_bodyObject, base.Owner);
+        InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner);
 
         _bodyComponent = _bodyObject.GetComponent<AbstractBody>();
         Debug.Log("body");
@@ -227,7 +235,7 @@ public class Tank : NetworkBehaviour
         NetworkBehaviour oldTreadComponent = _treadComponent;
 
         _treadObject = Instantiate(prefab, treadContainer.transform);
-        base.Spawn(_treadObject, base.Owner);
+        InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner);
 
         _treadComponent = _treadObject.GetComponent<AbstractTread>();
         Debug.Log("tread");
