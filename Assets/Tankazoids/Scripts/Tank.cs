@@ -178,7 +178,7 @@ public class Tank : NetworkBehaviour
 
 
         _weapon0Object = Instantiate(prefab, weaponContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner);
+        InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner, true);
 
         Debug.Log("weapon");
         UpdateClientWeapon0(base.Owner, _weapon0Object, _weapon0Component);
@@ -206,7 +206,7 @@ public class Tank : NetworkBehaviour
         NetworkBehaviour oldBodyComponent = _bodyComponent;
 
         _bodyObject = Instantiate(prefab, bodyContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner);
+        InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner, true);
 
         _bodyComponent = _bodyObject.GetComponent<AbstractBody>();
         Debug.Log("body");
@@ -235,7 +235,7 @@ public class Tank : NetworkBehaviour
         NetworkBehaviour oldTreadComponent = _treadComponent;
 
         _treadObject = Instantiate(prefab, treadContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner);
+        InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner, true);
 
         _treadComponent = _treadObject.GetComponent<AbstractTread>();
         Debug.Log("tread");
