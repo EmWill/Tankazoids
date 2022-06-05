@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8684820593299297279}
   - component: {fileID: 8033458679519913592}
   - component: {fileID: -3461197636976966752}
-  - component: {fileID: -2594761008400325781}
   m_Layer: 0
   m_Name: HellTreads
   m_TagString: Untagged
@@ -99,9 +98,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 679c753a9467dd64c94f9198f401ca5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: -3461197636976966752}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: -3461197636976966752}
+  material1: {fileID: 2100000, guid: 470246beb8b1f8e479a5ab7db36dcfdf, type: 2}
+  material2: {fileID: 2100000, guid: 3ab5f2287f0aa45468111cebadeebc0f, type: 2}
 --- !u!64 &8033458679519913592
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -129,11 +130,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkBehaviours:
-  - {fileID: 0}
+  - {fileID: 8684820593299297279}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    LocalScale: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    LocalScale: {x: 0.1, y: 0.10000001, z: 0.10000001}
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
@@ -141,45 +142,3 @@ MonoBehaviour:
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
---- !u!114 &-2594761008400325781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6170247899906028073}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: -3461197636976966752}
-  _networkObjectCache: {fileID: 0}
-  _synchronizeParent: 0
-  _packing:
-    Position: 1
-    Rotation: 1
-    Scale: 0
-  _interpolation: 2
-  _extrapolation: 2
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  _clientAuthoritative: 1
-  _sendToOwner: 1
-  _interval: 1
-  _synchronizePosition: 1
-  _positionSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeRotation: 1
-  _rotationSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeScale: 1
-  _scaleSnapping:
-    X: 0
-    Y: 0
-    Z: 0

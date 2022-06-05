@@ -10,6 +10,12 @@ public class HellTreads : AbstractTread
     private float _moveRate = 5;
     private Transform _transform;
 
+    public Material material1;
+    public Material material2;
+
+    private int time = 0;
+    private bool isMaterial1;
+
     public override Vector2 HandleMovement(Vector2 directionalInput, bool abilityPressed, Vector2 position, Tank tank)
     {
         if (directionalInput.x != 0 || directionalInput.y != 0)
@@ -63,5 +69,27 @@ public class HellTreads : AbstractTread
     public override float GetCooldown()
     {
         return 0;
+    }
+
+    void Update()
+    {
+        if (_moving)
+        {
+            time = (time + 1) % 25;
+
+            if (time == 0)
+            {
+                if (isMaterial1)
+                {
+                    isMaterial1 = false;
+                    gameObject.GetComponent<MeshRenderer>().material = material2;
+                }
+                else
+                {
+                    isMaterial1 = true;
+                    gameObject.GetComponent<MeshRenderer>().material = material1;
+                }
+            }
+        }
     }
 }

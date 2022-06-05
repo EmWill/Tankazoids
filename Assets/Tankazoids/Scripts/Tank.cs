@@ -221,15 +221,6 @@ public class Tank : NetworkBehaviour
         Destroy(oldWeapon);
     }
 
-    [ObserversRpc(BufferLast = true)]
-    public void UpdateClientWeapon0(NetworkConnection conn, GameObject weaponObject, AbstractWeapon weaponComponent)
-    {
-        weaponObject.transform.SetParent(weaponContainer.transform);
-
-        _weapon0Object = weaponObject;
-        _weapon0Component = weaponComponent;
-    }
-
     public void EquipBody(GameObject prefab)
     {
         GameObject oldBody = _bodyObject;
@@ -250,15 +241,6 @@ public class Tank : NetworkBehaviour
         Destroy(oldBody);
     }
 
-    [ObserversRpc(BufferLast = true)]
-    public void UpdateClientBody(NetworkConnection conn, GameObject bodyObject, AbstractBody bodyComponent)
-    {
-        bodyObject.transform.SetParent(bodyContainer.transform);
-
-        _bodyObject = bodyObject;
-        _bodyComponent = bodyComponent;
-    }
-
     public void EquipTread(GameObject prefab)
     {
         GameObject oldTread = _treadObject;
@@ -277,6 +259,24 @@ public class Tank : NetworkBehaviour
 
         oldTreadComponent.Despawn();
         Destroy(oldTread);
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    public void UpdateClientWeapon0(NetworkConnection conn, GameObject weaponObject, AbstractWeapon weaponComponent)
+    {
+        weaponObject.transform.SetParent(weaponContainer.transform);
+
+        _weapon0Object = weaponObject;
+        _weapon0Component = weaponComponent;
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    public void UpdateClientBody(NetworkConnection conn, GameObject bodyObject, AbstractBody bodyComponent)
+    {
+        bodyObject.transform.SetParent(bodyContainer.transform);
+
+        _bodyObject = bodyObject;
+        _bodyComponent = bodyComponent;
     }
 
     [ObserversRpc(BufferLast = true)]
