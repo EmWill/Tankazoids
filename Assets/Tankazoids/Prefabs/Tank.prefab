@@ -71,6 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8955394069440702962}
+  - component: {fileID: 2374529147469697304}
   m_Layer: 0
   m_Name: GraphicalObject
   m_TagString: Untagged
@@ -96,6 +97,30 @@ Transform:
   m_Father: {fileID: 9117857247562382215}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2374529147469697304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7276547841584979082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkBehaviours: []
+  SceneTransformProperties:
+    Position: {x: 0, y: 1, z: 0}
+    Rotation: {x: -0, y: -0, z: -0, w: 1}
+    LocalScale: {x: 1, y: 1, z: 1}
+  _isNetworked: 1
+  _hasParentNetworkObjectAtEdit: 0
+  NetworkObserver: {fileID: 0}
+  _prefabId: -1
+  _scenePathHash: 0
+  _sceneId: 0
+  _sceneNetworkObjects: []
 --- !u!1 &8291602885774719809
 GameObject:
   m_ObjectHideFlags: 0
@@ -105,6 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8827324201179474270}
+  - component: {fileID: 8930146710340662400}
   m_Layer: 0
   m_Name: TreadContainer
   m_TagString: Untagged
@@ -127,6 +153,30 @@ Transform:
   m_Father: {fileID: 8955394069440702962}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: -90}
+--- !u!114 &8930146710340662400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8291602885774719809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkBehaviours: []
+  SceneTransformProperties:
+    Position: {x: 0, y: 1, z: 0}
+    Rotation: {x: -0.5, y: 0.5, z: 0.5, w: -0.5}
+    LocalScale: {x: 1, y: 1, z: 1}
+  _isNetworked: 1
+  _hasParentNetworkObjectAtEdit: 1
+  NetworkObserver: {fileID: 0}
+  _prefabId: -1
+  _scenePathHash: 0
+  _sceneId: 0
+  _sceneNetworkObjects: []
 --- !u!1 &9117857247562382221
 GameObject:
   m_ObjectHideFlags: 0
