@@ -115,7 +115,7 @@ MonoBehaviour:
     Rotation: {x: -0, y: -0, z: -0, w: 1}
     LocalScale: {x: 1, y: 1, z: 1}
   _isNetworked: 1
-  _hasParentNetworkObjectAtEdit: 0
+  _hasParentNetworkObjectAtEdit: 1
   NetworkObserver: {fileID: 0}
   _prefabId: -1
   _scenePathHash: 0
@@ -193,6 +193,7 @@ GameObject:
   - component: {fileID: 3400909939688374997}
   - component: {fileID: 6282808310638124202}
   - component: {fileID: 7137395013629363915}
+  - component: {fileID: 3523769503687307436}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -233,6 +234,7 @@ MonoBehaviour:
   - {fileID: 1012129365208062032}
   - {fileID: 6282808310638124202}
   - {fileID: 7137395013629363915}
+  - {fileID: 3523769503687307436}
   SceneTransformProperties:
     Position: {x: 0, y: 1, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -291,7 +293,7 @@ MonoBehaviour:
   _interpolation: 2
   _extrapolation: 0
   _enableTeleport: 0
-  _teleportThreshold: 1
+  _teleportThreshold: 4.2081005e+37
   _clientAuthoritative: 0
   _sendToOwner: 0
   _interval: 0
@@ -395,3 +397,21 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 9117857247562382210}
   _networkObjectCache: {fileID: 9117857247562382210}
   fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}
+--- !u!114 &3523769503687307436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9117857247562382221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 4
+  _addedNetworkObject: {fileID: 9117857247562382210}
+  _networkObjectCache: {fileID: 9117857247562382210}
+  _overrideType: 3
+  _observerConditions:
+  - {fileID: 11400000, guid: 2033f54fd2794464bae08fa5a55c8996, type: 2}

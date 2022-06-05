@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1936128211711317558}
   - component: {fileID: 4190702637172379160}
   - component: {fileID: 441169939086373767}
-  - component: {fileID: 5806922561906070023}
   - component: {fileID: 6577381125802195722}
   - component: {fileID: 4862220967960357220}
   - component: {fileID: -3640747778986559433}
@@ -102,19 +101,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &5806922561906070023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5509078380185883884}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e67a01fefd8d2b4082ae25e46027890, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  adjustment: {x: -90, y: -90, z: -90}
 --- !u!114 &6577381125802195722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,7 +132,7 @@ MonoBehaviour:
   - {fileID: 6577381125802195722}
   - {fileID: -3640747778986559433}
   SceneTransformProperties:
-    Position: {x: 0, y: 0.2, z: 0}
+    Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   _isNetworked: 1

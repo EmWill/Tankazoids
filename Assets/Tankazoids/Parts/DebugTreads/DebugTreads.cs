@@ -6,7 +6,7 @@ public class DebugTreads : AbstractTread
 {
     public override Vector2 HandleMovement(Vector2 directionalInput, bool abilityPressed, Vector2 position, Tank tank)
     {
-        return position + directionalInput;
+        return position + directionalInput/10;
     }
 
     public override void DecayVelocity(ref Vector2 velocity, Tank tank) { }

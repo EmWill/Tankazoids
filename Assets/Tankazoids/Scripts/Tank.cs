@@ -47,6 +47,8 @@ public class Tank : NetworkBehaviour
 
     public struct InputData
     {
+        public Vector3 worldTargetPos;
+
         public float horizontal;
         public float vertical;
 
@@ -55,8 +57,10 @@ public class Tank : NetworkBehaviour
         public bool bodyPressed;
         public bool treadPressed;
 
-        public InputData(float horizontal, float vertical, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed)
+        public InputData(Vector3 worldTargetPos, float horizontal, float vertical, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed)
         {
+            this.worldTargetPos = worldTargetPos;
+
             this.horizontal = horizontal;
             this.vertical = vertical;
 
@@ -64,6 +68,8 @@ public class Tank : NetworkBehaviour
             this.weapon1Pressed = weapon1Pressed;
             this.bodyPressed = bodyPressed;
             this.treadPressed = treadPressed;
+
+
         }
     }
 
@@ -71,10 +77,15 @@ public class Tank : NetworkBehaviour
     {
         public Vector3 position;
         public Quaternion rotation;
-        public ReconcileData(Vector3 position, Quaternion rotation)
+
+        public Quaternion weaponContianerRotation;
+
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponContianerRotation)
         {
             this.position = position;
             this.rotation = rotation;
+
+            this.weaponContianerRotation = weaponContianerRotation;
         }
     }
 
@@ -98,18 +109,21 @@ public class Tank : NetworkBehaviour
         InstanceFinder.TimeManager.OnTick += OnTick;
     }
 
-    public override void OnStartClient()
+    private void OnDestroy()
     {
-        base.OnStartClient();
-
-        Debug.Log("client moment");
-
-        if (base.IsOwner)
+        if (InstanceFinder.TimeManager != null)
         {
-            EquipWeapon0(defaultWeapon0Prefab);
-            EquipBody(defaultBodyPrefab);
-            EquipTread(defaultTreadPrefab);
+            InstanceFinder.TimeManager.OnTick -= OnTick;
         }
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        EquipWeapon0(defaultWeapon0Prefab);
+        EquipBody(defaultBodyPrefab);
+        EquipTread(defaultTreadPrefab);
     }
 
     private void OnTick()
@@ -117,26 +131,28 @@ public class Tank : NetworkBehaviour
         if (base.IsOwner)
         {
             Reconciliation(default, false);
-            HandleMovement(GetInputData(), false);
+            Replicate(GetInputData(), false);
         }
 
         if (base.IsServer)
         {
-            HandleMovement(default, true);
-            ReconcileData reconcileData = new ReconcileData(transform.position, transform.rotation);
+            Replicate(default, true);
+            ReconcileData reconcileData = new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation);
             Reconciliation(reconcileData, true);
         }
     }
 
     private InputData GetInputData()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        // todo get a reference to the camera... maybe
+        Camera camera = Camera.main;
 
-        if (horizontal == 0f && vertical == 0f)
-            return default;
+        Vector3 mousePosition = Input.mousePosition;
+        Vector3 worldPointCoords = camera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, -camera.transform.position.z));
+        Vector3 mouseWorldCoords = new(worldPointCoords.x, worldPointCoords.y, 0);
 
         return new InputData(
+                mouseWorldCoords,
                 Input.GetAxisRaw("Horizontal"),
                 Input.GetAxisRaw("Vertical"),
                 Input.GetButton("Weapon0"),
@@ -147,13 +163,23 @@ public class Tank : NetworkBehaviour
     }
 
     [Replicate]
-    private void HandleMovement(InputData inputData, bool asServer, bool replaying = false)
+    private void Replicate(InputData inputData, bool asServer, bool replaying = false)
     {
+        // todo fix this is bad
+        RotateWeaponContainerTowardsCoordinates(inputData.worldTargetPos);
+
+        _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
+
         if (_treadComponent == null)
         {
             return;
         }
-        _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
+    }
+
+    private void RotateWeaponContainerTowardsCoordinates(Vector3 coordinates)
+    {
+        Vector3 difference = coordinates - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
+        weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
     }
 
     [Reconcile]
@@ -161,26 +187,19 @@ public class Tank : NetworkBehaviour
     {
         transform.position = rd.position;
         transform.rotation = rd.rotation;
+
+        weaponContainer.transform.rotation = rd.weaponContianerRotation;
     }
 
-    private void OnDestroy()
-    {
-        if (InstanceFinder.TimeManager != null)
-        {
-            InstanceFinder.TimeManager.OnTick -= OnTick;
-        }
-    }
-
-    [ServerRpc]
     public void EquipWeapon0(GameObject prefab) {
         GameObject oldWeapon = _weapon0Object;
         NetworkBehaviour oldWeaponComponent = _weapon0Component;
 
 
         _weapon0Object = Instantiate(prefab, weaponContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner, true);
+        InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner);
 
-        Debug.Log("weapon");
+        _weapon0Component = _weapon0Object.GetComponent<AbstractWeapon>();
         UpdateClientWeapon0(base.Owner, _weapon0Object, _weapon0Component);
 
         if (oldWeapon == null)
@@ -192,24 +211,24 @@ public class Tank : NetworkBehaviour
         Destroy(oldWeapon);
     }
 
-    [TargetRpc]
+    [ObserversRpc(BufferLast = true)]
     public void UpdateClientWeapon0(NetworkConnection conn, GameObject weaponObject, AbstractWeapon weaponComponent)
     {
+        weaponObject.transform.SetParent(weaponContainer.transform);
+
         _weapon0Object = weaponObject;
         _weapon0Component = weaponComponent;
     }
 
-    [ServerRpc]
     public void EquipBody(GameObject prefab)
     {
         GameObject oldBody = _bodyObject;
         NetworkBehaviour oldBodyComponent = _bodyComponent;
 
         _bodyObject = Instantiate(prefab, bodyContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner, true);
+        InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner);
 
         _bodyComponent = _bodyObject.GetComponent<AbstractBody>();
-        Debug.Log("body");
         UpdateClientBody(base.Owner, _bodyObject, _bodyComponent);
 
         if (oldBody == null)
@@ -221,25 +240,25 @@ public class Tank : NetworkBehaviour
         Destroy(oldBody);
     }
 
-    [TargetRpc]
+    [ObserversRpc(BufferLast = true)]
     public void UpdateClientBody(NetworkConnection conn, GameObject bodyObject, AbstractBody bodyComponent)
     {
+        bodyObject.transform.SetParent(bodyContainer.transform);
+
         _bodyObject = bodyObject;
         _bodyComponent = bodyComponent;
     }
 
-    [ServerRpc]
     public void EquipTread(GameObject prefab)
     {
         GameObject oldTread = _treadObject;
         NetworkBehaviour oldTreadComponent = _treadComponent;
 
         _treadObject = Instantiate(prefab, treadContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner, true);
+        InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner);
 
         _treadComponent = _treadObject.GetComponent<AbstractTread>();
-        Debug.Log("tread");
-        UpdateClientTread(base.Owner, _treadObject, _treadComponent);
+        UpdateClientTread(_treadObject, _treadComponent);
 
         if (oldTread == null)
         {
@@ -250,9 +269,11 @@ public class Tank : NetworkBehaviour
         Destroy(oldTread);
     }
 
-    [TargetRpc]
-    public void UpdateClientTread(NetworkConnection conn, GameObject treadObject, AbstractTread treadComponent)
+    [ObserversRpc(BufferLast = true)]
+    public void UpdateClientTread(GameObject treadObject, AbstractTread treadComponent)
     {
+        treadObject.transform.SetParent(treadContainer.transform);
+
         _treadObject = treadObject;
         _treadComponent = treadComponent;
     }
