@@ -9,7 +9,7 @@ public abstract class AbstractWeapon : AbstractPart
     public delegate bool OnSharedCooldownAbilityUseHandler();
     private bool _sharesCooldown;
     public event OnSharedCooldownAbilityUseHandler OnSharedCooldownAbilityUse = () => true;
-    public GameObject Projectile;
+    public GameObject projectile;
     protected float _shotSpeed;
     protected float _timeToLive;
     protected float _baseDamage;
@@ -18,7 +18,7 @@ public abstract class AbstractWeapon : AbstractPart
     {
         base.ActivateAbility(inputData, tank);
 
-        if (OnSharedCooldownAbilityUse() && Time.time >= CanUseAt)
+        if (true && Time.time >= CanUseAt)
         {
             Ability(inputData, tank);
             CanUseAt = Time.time + (tank.cooldownModifiers.CalculateStat(_baseCooldown));
