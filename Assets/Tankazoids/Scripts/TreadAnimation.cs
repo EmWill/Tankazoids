@@ -12,9 +12,9 @@ public class TreadAnimation : MonoBehaviour
 
     void Update()
     {
-        time = (time + 1) % 5;
+        time = (time + 1) % 25;
 
-        if (Random.RandomRange(0, 3000) < 2500)
+        if (time == 0)
         {
             if (isMaterial1)
             {

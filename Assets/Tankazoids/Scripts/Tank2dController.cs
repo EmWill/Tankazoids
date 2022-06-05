@@ -44,12 +44,6 @@ namespace FishNet.Example.Prediction.CharacterControllers
         private float _turnRate = 5f;
 
         [SerializeField]
-        private float _accelerationSmoothing = .05f;
-
-        [SerializeField]
-        private float _angularAccelerationSmoothing = .05f;
-
-        [SerializeField]
         private GameObject _bullet;
         #endregion
 
@@ -62,6 +56,7 @@ namespace FishNet.Example.Prediction.CharacterControllers
         private bool _moving = false;
         private Tank _tank;
         private float _canFireAt;
+        private const float ACCEPTABLEANGLE = 10f;
         #endregion
 
 
@@ -125,7 +120,6 @@ namespace FishNet.Example.Prediction.CharacterControllers
                 aim.z = 0;
                 aim = aim - spawnPos;
                 b.Shoot(aim.normalized);
-                _canFireAt = Time.time + _tank.RateOfFire.Value;
             }
         }
 
@@ -150,12 +144,12 @@ namespace FishNet.Example.Prediction.CharacterControllers
             float bowAngle = Vector2.SignedAngle(transform.up, newDirection);
             float sternAngle = Vector2.SignedAngle(-transform.up, newDirection);
             float angle = bowAngle;
-            if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && !_moving)
+            if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && (!_moving || sternAngle < ACCEPTABLEANGLE))
             {
                 angle = sternAngle;
                 _reverse = true;
             }
-            else if (!_moving)
+            else if (!_moving || sternAngle < ACCEPTABLEANGLE)
             {
                 angle = bowAngle;
                 _reverse = false;

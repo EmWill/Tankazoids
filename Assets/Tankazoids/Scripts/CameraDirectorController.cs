@@ -7,6 +7,7 @@ public class CameraDirectorController : MonoBehaviour
     public GameObject followingObject;
     public float mousePlayerInterpolation;
     public float dampening;
+    public Vector2 maxViewPort;
 
     public Camera myCamera;
 
@@ -17,7 +18,7 @@ public class CameraDirectorController : MonoBehaviour
         Vector3 viewPortCoords = myCamera.ScreenToViewportPoint(Input.mousePosition);
 
         // we gotta clamp the view port coords or else multi montitor setups would be op!!!
-        Vector3 worldPointCoords = myCamera.ViewportToWorldPoint(new Vector3(Mathf.Clamp(viewPortCoords.x, 0, 1), Mathf.Clamp(viewPortCoords.y, 0, 1), -myCamera.transform.position.z));
+        Vector3 worldPointCoords = myCamera.ViewportToWorldPoint(new Vector3(Mathf.Clamp(viewPortCoords.x, 0, maxViewPort.x), Mathf.Clamp(viewPortCoords.y, 0, maxViewPort.y), -myCamera.transform.position.z));
 
         Vector3 mouseWorldCoords = new(worldPointCoords.x, worldPointCoords.y, 0);
         Vector3 targetLookAtPosition = mouseWorldCoords * (mousePlayerInterpolation) + (followingObject.transform.position * (1 - mousePlayerInterpolation));

@@ -6,37 +6,46 @@ using UnityEngine;
 
 public class StatManager<T>
 {
-    public T Value { get; private set; }
     private readonly List<StatModifier<T>> _statModifiers;
-    private readonly T _baseStat;
+    private readonly Dictionary<T, T> _cache;
 
-    public StatManager(T baseStat)
+    public StatManager()
     {
         _statModifiers = new List<StatModifier<T>>();
-        _baseStat = baseStat;
-        Value = _baseStat;
+        _cache = new();
     }
 
     public void AddStatModifier(StatModifier<T> mod)
     {
         _statModifiers.Add(mod);
-        Value = CalculateStat(_statModifiers, _baseStat);
+        _statModifiers.Sort();
+
+        // invalidate cache
+        _cache.Clear();
     }
 
     public void RemoveStatModifier(StatModifier<T> mod)
     {
         _statModifiers.Remove(mod);
-        Value = CalculateStat(_statModifiers, _baseStat);
+
+        // invalidate cache
+        _cache.Clear();
     }
 
-    private T CalculateStat(List<StatModifier<T>> mods, T initialStat)
+    private T CalculateStat(T value)
     {
-        T resultStat = initialStat;
-        mods.Sort();
-        foreach (StatModifier<T> mod in mods)
+        if (_cache.ContainsKey(value))
+        {
+            return _cache[value];
+        }
+
+        T resultStat = value;
+        foreach (StatModifier<T> mod in _statModifiers)
         {
             resultStat = mod.Mod(resultStat);
         }
+
+        _cache.Add(value, resultStat);
         return resultStat;
     }
 }
