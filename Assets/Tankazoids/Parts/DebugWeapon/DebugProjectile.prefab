@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 9170840646698823064}
   - component: {fileID: -7715518736866777392}
   - component: {fileID: 2615850986456712606}
-  - component: {fileID: 3323261471173554615}
-  - component: {fileID: 6246388568043883935}
-  - component: {fileID: -9033070488477088913}
+  - component: {fileID: 8722716170557939542}
+  - component: {fileID: 1918144889854905933}
+  - component: {fileID: -5822064554836150010}
   m_Layer: 0
   m_Name: DebugProjectile
   m_TagString: Untagged
@@ -61,8 +61,8 @@ MonoBehaviour:
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  _clientAuthoritative: 0
-  _sendToOwner: 0
+  _clientAuthoritative: 1
+  _sendToOwner: 1
   _interval: 1
   _synchronizePosition: 1
   _positionSnapping:
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkBehaviours:
   - {fileID: -7715518736866777392}
-  - {fileID: 3323261471173554615}
+  - {fileID: 1918144889854905933}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -101,11 +101,32 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 10
+  _prefabId: 6
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
---- !u!114 &3323261471173554615
+--- !u!50 &8722716170557939542
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598151544206760318}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &1918144889854905933
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -122,45 +143,22 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2615850986456712606}
   Shooter: {fileID: 0}
   BaseDamage: 10
---- !u!54 &6246388568043883935
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7598151544206760318}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &-9033070488477088913
-MonoBehaviour:
+--- !u!58 &-5822064554836150010
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7598151544206760318}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 402926ef33e0a894d9fec352693988ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 2615850986456712606}
-  _networkObjectCache: {fileID: 0}
-  _graphicalObject: {fileID: 0}
-  _smoothTicks: 1
-  _smoothingDuration: 0.125
-  _predictionType: 0
-  _rigidbody: {fileID: 0}
-  _rigidbody2d: {fileID: 0}
-  _networkTransform: {fileID: -7715518736866777392}
-  _predictionRatio: 0
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &9076445479882123054
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,14 +8,14 @@ public class Projectile : NetworkBehaviour
     public Tank Shooter;
     public float BaseDamage;
 
-    //private void OnCollisionEnter(Collision collision)
-    //{
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
 
-    //    if (collision.gameObject.TryGetComponent(out Tank tank))
-    //    {
-    //        float dmg = Shooter.damageModifiers.CalculateStat(BaseDamage);
-    //        tank.RaiseOnHitEvent(ref dmg);
-    //    }
-    //    Destroy(gameObject);
-    //}
+        if (collision.gameObject.TryGetComponent(out Tank tank))
+        {
+            float dmg = Shooter.damageModifiers.CalculateStat(BaseDamage);
+            tank.RaiseOnHitEvent(ref dmg);
+        }
+        Destroy(gameObject);
+    }
 }

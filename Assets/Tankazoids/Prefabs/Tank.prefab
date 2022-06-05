@@ -44,9 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 2374529147469697304}
-  _networkObjectCache: {fileID: 0}
+  _componentIndexCache: 5
+  _addedNetworkObject: {fileID: 9117857247562382210}
+  _networkObjectCache: {fileID: 9117857247562382210}
   _synchronizeParent: 0
   _packing:
     Position: 1
@@ -114,7 +114,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8955394069440702962}
-  - component: {fileID: 2374529147469697304}
   m_Layer: 0
   m_Name: GraphicalObject
   m_TagString: Untagged
@@ -140,30 +139,6 @@ Transform:
   m_Father: {fileID: 9117857247562382215}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2374529147469697304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7276547841584979082}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _networkBehaviours: []
-  SceneTransformProperties:
-    Position: {x: 0, y: 1, z: 0}
-    Rotation: {x: -0, y: -0, z: -0, w: 1}
-    LocalScale: {x: 1, y: 1, z: 1}
-  _isNetworked: 1
-  _hasParentNetworkObjectAtEdit: 1
-  NetworkObserver: {fileID: 0}
-  _prefabId: -1
-  _scenePathHash: 0
-  _sceneId: 0
-  _sceneNetworkObjects: []
 --- !u!1 &8291602885774719809
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,7 +148,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8827324201179474270}
-  - component: {fileID: 8930146710340662400}
   m_Layer: 0
   m_Name: TreadContainer
   m_TagString: Untagged
@@ -196,30 +170,6 @@ Transform:
   m_Father: {fileID: 8955394069440702962}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: -90}
---- !u!114 &8930146710340662400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8291602885774719809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _networkBehaviours: []
-  SceneTransformProperties:
-    Position: {x: 0, y: 1, z: 0}
-    Rotation: {x: -0.5, y: 0.5, z: 0.5, w: -0.5}
-    LocalScale: {x: 1, y: 1, z: 1}
-  _isNetworked: 1
-  _hasParentNetworkObjectAtEdit: 1
-  NetworkObserver: {fileID: 0}
-  _prefabId: -1
-  _scenePathHash: 0
-  _sceneId: 0
-  _sceneNetworkObjects: []
 --- !u!1 &9117857247562382221
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,6 +228,7 @@ MonoBehaviour:
   - {fileID: 6282808310638124202}
   - {fileID: 7137395013629363915}
   - {fileID: 3523769503687307436}
+  - {fileID: 8612475030902653931}
   SceneTransformProperties:
     Position: {x: 0, y: 1, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -285,7 +236,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 7
+  _prefabId: 1
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects:
@@ -420,7 +371,7 @@ MonoBehaviour:
   defaultWeapon0Prefab: {fileID: 5509078380185883884, guid: e0b7281f02c3e4c4cad6a2da98ae67e3, type: 3}
   defaultWeapon1Prefab: {fileID: 5509078380185883884, guid: e0b7281f02c3e4c4cad6a2da98ae67e3, type: 3}
   defaultBodyPrefab: {fileID: 1501870720023411529, guid: 0ebc1d0f04d271d4ebe082e9b6511c8c, type: 3}
-  defaultTreadPrefab: {fileID: 6170247899906028073, guid: d029c07c34b746048805836a0db5d012, type: 3}
+  defaultTreadPrefab: {fileID: 6170247899906028073, guid: 10a3d359182a7fa42ab242378f4fca11, type: 3}
   weaponContainer: {fileID: 1718083181954545904}
   bodyContainer: {fileID: 6561867702871784555}
   treadContainer: {fileID: 8291602885774719809}

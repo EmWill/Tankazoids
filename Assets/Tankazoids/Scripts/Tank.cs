@@ -131,9 +131,9 @@ public class Tank : NetworkBehaviour
         if (base.IsOwner)
         {
             Reconciliation(default, false);
-            //InputData input = GetInputData();
-            Replicate(GetInputData(), false);
-            //NonReplicatedInput(input);
+            InputData input = GetInputData();
+            Replicate(input, false);
+            NonReplicatedInput(input);
         }
 
         if (base.IsServer)
@@ -169,21 +169,15 @@ public class Tank : NetworkBehaviour
     {
         // todo fix this is bad
         RotateWeaponContainerTowardsCoordinates(inputData.worldTargetPos);
-        if (base.IsClient)
-        {
-            Debug.Log("Client:" + inputData.horizontal);
-        }
-        if (base.IsServer)
-        {
-            Debug.Log("Server:" + inputData.horizontal);
-        }
-        _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
+
         if (_treadComponent == null)
         {
             return;
         }
+        _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
     }
 
+    [ServerRpc]
     private void NonReplicatedInput(InputData inputData)
     {
         if (inputData.weapon0Pressed)
