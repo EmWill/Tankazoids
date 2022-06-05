@@ -5,6 +5,8 @@ using UnityEngine;
 
 public abstract class AbstractPart : NetworkBehaviour
 {
+    public void ActivateAbility(Tank.InputData inputData, Tank tank) { }
+
     public void Equip(ref Tank tank)
     {
 

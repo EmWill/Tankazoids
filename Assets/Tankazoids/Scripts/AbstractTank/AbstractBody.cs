@@ -5,8 +5,6 @@ using UnityEngine;
 
 public abstract class AbstractBody : AbstractPart
 {
-    public void ActivateAbility(Tank tank) {}
-
     public abstract int GetMaxHealth();
 
     public abstract int GetMaxAmmo();

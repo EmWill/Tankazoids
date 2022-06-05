@@ -183,12 +183,12 @@ public class Tank : NetworkBehaviour
     }
 
     [Reconcile]
-    private void Reconciliation(ReconcileData rd, bool asServer)
+    private void Reconciliation(ReconcileData reconcileData, bool asServer)
     {
-        transform.position = rd.position;
-        transform.rotation = rd.rotation;
+        transform.position = reconcileData.position;
+        transform.rotation = reconcileData.rotation;
 
-        weaponContainer.transform.rotation = rd.weaponContianerRotation;
+        weaponContainer.transform.rotation = reconcileData.weaponContianerRotation;
     }
 
     public void EquipWeapon0(GameObject prefab) {
