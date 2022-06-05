@@ -5,8 +5,25 @@ using UnityEngine;
 
 public abstract class AbstractWeapon : AbstractPart
 {
-    public bool SharesCooldownWithOtherWeapon()
+    
+    public delegate bool OnSharedCooldownAbilityUseHandler();
+    private bool _sharesCooldown;
+    public event OnSharedCooldownAbilityUseHandler OnSharedCooldownAbilityUse = () => true;
+    public GameObject Projectile;
+    protected float _shotSpeed;
+    protected float _timeToLive;
+    protected float _baseDamage;
+
+    public override void ActivateAbility(Tank.InputData inputData, Tank tank)
     {
-        return true;
+        base.ActivateAbility(inputData, tank);
+
+        if (OnSharedCooldownAbilityUse() && Time.time >= CanUseAt)
+        {
+            Ability(inputData, tank);
+            CanUseAt = Time.time + (tank.cooldownModifiers.CalculateStat(_baseCooldown));
+        }
     }
+
+    protected abstract void Ability(Tank.InputData inputData, Tank tank);
 }

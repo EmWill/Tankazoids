@@ -40,7 +40,7 @@ public class Tank : NetworkBehaviour
     private float _heat;
     private float _health;
 
-    public delegate void OnHitHandler(Bullet bullet);
+    public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
     private Rigidbody2D _rigidbody2D;
@@ -131,7 +131,9 @@ public class Tank : NetworkBehaviour
         if (base.IsOwner)
         {
             Reconciliation(default, false);
+            //InputData input = GetInputData();
             Replicate(GetInputData(), false);
+            //NonReplicatedInput(input);
         }
 
         if (base.IsServer)
@@ -167,12 +169,26 @@ public class Tank : NetworkBehaviour
     {
         // todo fix this is bad
         RotateWeaponContainerTowardsCoordinates(inputData.worldTargetPos);
-
+        if (base.IsClient)
+        {
+            Debug.Log("Client:" + inputData.horizontal);
+        }
+        if (base.IsServer)
+        {
+            Debug.Log("Server:" + inputData.horizontal);
+        }
         _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
-
         if (_treadComponent == null)
         {
             return;
+        }
+    }
+
+    private void NonReplicatedInput(InputData inputData)
+    {
+        if (inputData.weapon0Pressed)
+        {
+            _weapon0Component.ActivateAbility(inputData, this);
         }
     }
 
@@ -278,8 +294,13 @@ public class Tank : NetworkBehaviour
         _treadComponent = treadComponent;
     }
 
-    public void RaiseOnHitEvent(Bullet bullet)
+    public void RaiseOnHitEvent(ref float dmg)
     {
-        OnHit(bullet);
+        OnHit(ref dmg);
+        _health -= dmg;
+        if (_health <= 0)
+        {
+            //TODO: u r dead.
+        }
     }
 }

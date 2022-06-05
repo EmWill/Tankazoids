@@ -32,7 +32,7 @@ public class StatManager<T>
         _cache.Clear();
     }
 
-    private T CalculateStat(T value)
+    public T CalculateStat(T value)
     {
         if (_cache.ContainsKey(value))
         {

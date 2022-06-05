@@ -110,16 +110,16 @@ namespace FishNet.Example.Prediction.CharacterControllers
             {
                 Vector3 spawnPos = transform.up * 2 + transform.position;
                 GameObject gob = Instantiate(_bullet, spawnPos, transform.rotation);
-                Bullet b = gob.GetComponent<Bullet>();
-                b.Damage = 10f;
-                b.Speed = 200f;
+                //Bullet b = gob.GetComponent<Bullet>();
+                //b.Damage = 10f;
+                //b.Speed = 200f;
                 Spawn(gob, conn);
                 Vector3 aim = Input.mousePosition;
                 aim.z = -Camera.main.transform.position.z;
                 aim = Camera.main.ScreenToWorldPoint(aim);
                 aim.z = 0;
                 aim = aim - spawnPos;
-                b.Shoot(aim.normalized);
+                //b.Shoot(aim.normalized);
             }
         }
 
