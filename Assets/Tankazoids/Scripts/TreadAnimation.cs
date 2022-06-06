@@ -12,7 +12,7 @@ public class TreadAnimation : MonoBehaviour
 
     void Update()
     {
-        time = (time + 1) % 25;
+        time = (time + 1) % 100;
 
         if (time == 0)
         {

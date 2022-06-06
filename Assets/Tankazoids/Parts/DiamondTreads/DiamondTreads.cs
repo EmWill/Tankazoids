@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HeavenTreads : AbstractTread
+public class DiamondTreads : AbstractTread
 {
     private bool _reverse = false;
     private bool _moving = false;
