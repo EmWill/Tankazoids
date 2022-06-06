@@ -16,14 +16,14 @@ public class HellTreads : AbstractTread
     private int time = 0;
     private bool isMaterial1;
 
-    public override Vector2 HandleMovement(Vector2 directionalInput, bool abilityPressed, Vector2 position, Tank tank)
+    public Vector2 HandleMovement(Vector2 directionalInput, bool abilityPressed, Vector2 position)
     {
         if (directionalInput.x != 0 || directionalInput.y != 0)
             print("hel yeah brother");
         Vector2 newDirection = new Vector2(directionalInput.x, directionalInput.y).normalized;
         float motion = Mathf.Min(newDirection.magnitude, 1f);
-        float bowAngle = Vector2.SignedAngle(tank.transform.up, newDirection);
-        float sternAngle = Vector2.SignedAngle(-tank.transform.up, newDirection);
+        float bowAngle = Vector2.SignedAngle(_tank.transform.up, newDirection);
+        float sternAngle = Vector2.SignedAngle(-_tank.transform.up, newDirection);
         float angle = bowAngle;
         if (Mathf.Abs(bowAngle) > Mathf.Abs(sternAngle) && (!_moving || sternAngle < 10f))
         {
@@ -47,24 +47,22 @@ public class HellTreads : AbstractTread
             if (angle != 0)
             {
                 float rotationDistance = Mathf.Min(Mathf.Abs(angle), _turnRate * (float)base.TimeManager.TickDelta);
-                tank.transform.Rotate(0, 0, direction * rotationDistance);
+                _tank.transform.Rotate(0, 0, direction * rotationDistance);
             }
         }
         Vector2 retVal;
         if (!_reverse)
         {
-            retVal = tank.transform.position + tank.transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.position + _tank.transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta;
         }
         else
         {
-            retVal = tank.transform.position - tank.transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.position - _tank.transform.up * motion * _moveRate * (float)base.TimeManager.TickDelta;
         }
         _moving = motion > 0;
         return retVal;
 
     }
-
-    public override void DecayVelocity(ref Vector2 velocity, Tank tank) { }
 
     public override float GetCooldown()
     {

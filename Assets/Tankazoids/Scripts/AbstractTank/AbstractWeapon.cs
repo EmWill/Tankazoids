@@ -5,7 +5,6 @@ using UnityEngine;
 
 public abstract class AbstractWeapon : AbstractPart
 {
-    
     public delegate bool OnSharedCooldownAbilityUseHandler();
     private bool _sharesCooldown;
     public GameObject projectile;
@@ -15,14 +14,14 @@ public abstract class AbstractWeapon : AbstractPart
     protected float _timeToLive;
     protected float _baseDamage;
 
-    public override void ActivateAbility(Tank.InputData inputData, Tank tank)
+    public override void ActivateAbility(Tank.InputData inputData)
     {
-        base.ActivateAbility(inputData, tank);
+        base.ActivateAbility(inputData);
 
         if (true && Time.time >= CanUseAt)
         {
-            Ability(inputData, tank);
-            CanUseAt = Time.time + (tank.cooldownModifiers.CalculateStat(_baseCooldown));
+            Ability(inputData, _tank);
+            CanUseAt = Time.time + (_tank.cooldownModifiers.CalculateStat(_baseCooldown));
         }
     }
 
