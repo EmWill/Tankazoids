@@ -49,43 +49,23 @@ public class Tank : NetworkBehaviour
     {
         public Vector3 worldTargetPos;
 
-        public float horizontal;
-        public float vertical;
+        public Vector2 directionalInput;
 
         public bool weapon0Pressed;
         public bool weapon1Pressed;
         public bool bodyPressed;
         public bool treadPressed;
 
-        public InputData(Vector3 worldTargetPos, float horizontal, float vertical, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed)
+        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed)
         {
             this.worldTargetPos = worldTargetPos;
 
-            this.horizontal = horizontal;
-            this.vertical = vertical;
+            this.directionalInput = directionalInput;
 
             this.weapon0Pressed = weapon0Pressed;
             this.weapon1Pressed = weapon1Pressed;
             this.bodyPressed = bodyPressed;
             this.treadPressed = treadPressed;
-
-
-        }
-    }
-
-    public struct ReconcileData
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-
-        public Quaternion weaponContianerRotation;
-
-        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponContianerRotation)
-        {
-            this.position = position;
-            this.rotation = rotation;
-
-            this.weaponContianerRotation = weaponContianerRotation;
         }
     }
 
@@ -126,28 +106,16 @@ public class Tank : NetworkBehaviour
         EquipTread(defaultTreadPrefab);
     }
 
-    private void OnTick()
-    {
-        if (base.IsOwner)
-        {
-            Reconciliation(default, false);
-            InputData input = GetInputData();
-            Replicate(input, false);
-            NonReplicatedInput(input);
-        }
-
-        if (base.IsServer)
-        {
-            Replicate(default, true);
-            ReconcileData reconcileData = new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation);
-            Reconciliation(reconcileData, true);
-        }
-    }
-
     private InputData GetInputData()
     {
         // todo get a reference to the camera... maybe
         Camera camera = Camera.main;
+
+        // todo this is bad?
+        if (camera == null)
+        {
+            return default;
+        }
 
         Vector3 mousePosition = Input.mousePosition;
         Vector3 worldPointCoords = camera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, -camera.transform.position.z));
@@ -155,8 +123,7 @@ public class Tank : NetworkBehaviour
 
         return new InputData(
                 mouseWorldCoords,
-                Input.GetAxisRaw("Horizontal"),
-                Input.GetAxisRaw("Vertical"),
+                new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
                 Input.GetButton("Weapon0"),
                 Input.GetButton("Weapon1"),
                 Input.GetButton("Body"),
@@ -164,17 +131,17 @@ public class Tank : NetworkBehaviour
             );
     }
 
-    [Replicate]
-    private void Replicate(InputData inputData, bool asServer, bool replaying = false)
+    private void OnTick()
     {
-        // todo fix this is bad
-        RotateWeaponContainerTowardsCoordinates(inputData.worldTargetPos);
+        InputData inputData = GetInputData();
+        _weapon0Component.OnTankTick(inputData);
+        // _weapon1Component.OnTankTick(inputData);
+        _bodyComponent.OnTankTick(inputData);
+        _treadComponent.OnTankTick(inputData);
 
-        if (_treadComponent == null)
-        {
-            return;
-        }
-        _rigidbody2D.MovePosition(_treadComponent.HandleMovement(new Vector2(inputData.horizontal, inputData.vertical), inputData.treadPressed, transform.position, this));
+        NonReplicatedInput(inputData);
+
+        HandleWeaponRotation(inputData);
     }
 
     [ServerRpc]
@@ -182,25 +149,12 @@ public class Tank : NetworkBehaviour
     {
         if (inputData.weapon0Pressed)
         {
-            _weapon0Component.ActivateAbility(inputData, this);
+            _weapon0Component.ActivateAbility(inputData);
         }
     }
 
-    private void RotateWeaponContainerTowardsCoordinates(Vector3 coordinates)
-    {
-        Vector3 difference = coordinates - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
-        weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
-    }
-
-    [Reconcile]
-    private void Reconciliation(ReconcileData reconcileData, bool asServer)
-    {
-        transform.position = reconcileData.position;
-        transform.rotation = reconcileData.rotation;
-
-        weaponContainer.transform.rotation = reconcileData.weaponContianerRotation;
-    }
-
+    #region Equipping
+    // todo mkae this server_spawnweapon and put equip elsewhere?
     public void EquipWeapon0(GameObject prefab) {
         GameObject oldWeapon = _weapon0Object;
         NetworkBehaviour oldWeaponComponent = _weapon0Component;
@@ -210,7 +164,9 @@ public class Tank : NetworkBehaviour
         InstanceFinder.ServerManager.Spawn(_weapon0Object.GetComponent<NetworkObject>(), base.Owner);
 
         _weapon0Component = _weapon0Object.GetComponent<AbstractWeapon>();
+        _weapon0Component.OnEquip(this);
         UpdateClientWeapon0(base.Owner, _weapon0Object, _weapon0Component);
+
 
         if (oldWeapon == null)
         {
@@ -230,6 +186,7 @@ public class Tank : NetworkBehaviour
         InstanceFinder.ServerManager.Spawn(_bodyObject.GetComponent<NetworkObject>(), base.Owner);
 
         _bodyComponent = _bodyObject.GetComponent<AbstractBody>();
+        _bodyComponent.OnEquip(this);
         UpdateClientBody(base.Owner, _bodyObject, _bodyComponent);
 
         if (oldBody == null)
@@ -250,6 +207,7 @@ public class Tank : NetworkBehaviour
         InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner);
 
         _treadComponent = _treadObject.GetComponent<AbstractTread>();
+        _treadComponent.OnEquip(this);
         UpdateClientTread(_treadObject, _treadComponent);
 
         if (oldTread == null)
@@ -268,6 +226,8 @@ public class Tank : NetworkBehaviour
 
         _weapon0Object = weaponObject;
         _weapon0Component = weaponComponent;
+
+        _weapon0Component.OnEquip(this);
     }
 
     [ObserversRpc(BufferLast = true)]
@@ -277,6 +237,8 @@ public class Tank : NetworkBehaviour
 
         _bodyObject = bodyObject;
         _bodyComponent = bodyComponent;
+
+        _bodyComponent.OnEquip(this);
     }
 
     [ObserversRpc(BufferLast = true)]
@@ -286,7 +248,51 @@ public class Tank : NetworkBehaviour
 
         _treadObject = treadObject;
         _treadComponent = treadComponent;
+
+        _treadComponent.OnEquip(this);
     }
+    #endregion Equipping
+
+    #region Weapon Turning
+
+    public struct ReconcileWeaponTurnData
+    {
+        public Quaternion rotation;
+
+        public ReconcileWeaponTurnData(Quaternion rotation)
+        {
+            this.rotation = rotation;
+        }
+    }
+
+    private void HandleWeaponRotation(InputData inputData)
+    {
+        if (base.IsOwner)
+        {
+            ReconcileWeaponRotation(default, false);
+            ReplicateWeaponRotation(inputData, false);
+        }
+
+        if (base.IsServer)
+        {
+            ReplicateWeaponRotation(default, true);
+            ReconcileWeaponRotation(new ReconcileWeaponTurnData(weaponContainer.transform.rotation), true);
+        }
+    }
+
+    [Replicate]
+    private void ReplicateWeaponRotation(Tank.InputData inputData, bool asServer, bool replaying = false)
+    {
+        Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
+        weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
+    }
+
+    [Reconcile]
+    private void ReconcileWeaponRotation(ReconcileWeaponTurnData reconcileData, bool asServer)
+    {
+        weaponContainer.transform.rotation = reconcileData.rotation;
+    }
+    #endregion Weapon Turning
 
     public void RaiseOnHitEvent(ref float dmg)
     {

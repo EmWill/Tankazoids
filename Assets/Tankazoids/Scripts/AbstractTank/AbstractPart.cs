@@ -5,25 +5,25 @@ using UnityEngine;
 
 public abstract class AbstractPart : NetworkBehaviour
 {
+    protected Tank _tank;
+
     protected float _baseCooldown;
     public float CanUseAt { get; protected set; }
-    public virtual void ActivateAbility(Tank.InputData inputData, Tank tank) { }
+    public virtual void ActivateAbility(Tank.InputData inputData) { }
 
-    public void Equip(ref Tank tank)
+    public virtual void OnEquip(Tank tank)
     {
-
+        _tank = tank;
     }
 
-    public void Unequip(ref Tank tank)
+    public virtual void OnUnequip()
     {
 
     }
 
     // do we really need this ?
-    public void OnTick(ref Tank tank)
-    {
+    public virtual void OnTankTick(Tank.InputData inputData) {}
 
-    }
     private void Awake()
     {
         CanUseAt = Time.time;
