@@ -27,54 +27,22 @@ public class HeavenTreads : AbstractTread
         base.OnEquip(tank);
         _myTank = _tank;
 
-        _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
-    }
-
-    public struct ReconcileData
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-        public float currBoost;
-
-        public ReconcileData(Vector3 position, Quaternion rotation, float currBoost)
-        {
-            this.currBoost = currBoost;
-            this.position = position;
-            this.rotation = rotation;
-        }
+        // _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
 
     private void accelerate()
     {
-        _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
+        // _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
     }
     private void decelerate()
     {
-        _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
+        // _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
     }
 
-
-    public override void OnTankTick(Tank.InputData inputData)
+    public override void HandleMovement(Tank.InputData inputData)
     {
-        base.OnTankTick(inputData);
+        Debug.Log((float)base.TimeManager.TickDelta);
 
-        if (base.IsOwner)
-        {
-            ReconcileMovement(default, false);
-            ReplicateMovement(inputData, false);
-        }
-
-        if (base.IsServer)
-        {
-            ReplicateMovement(default, true);
-            ReconcileData reconcileData = new ReconcileData(_myTank.transform.position, _myTank.transform.rotation, _currBoost);
-            ReconcileMovement(reconcileData, true);
-        }
-    }
-
-    [Replicate]
-    private void ReplicateMovement(Tank.InputData inputData, bool asServer, bool replaying = false)
-    {
         float direction = 0;
         if (inputData.directionalInput.x > 0.3f)
             direction = -1;
@@ -107,7 +75,7 @@ public class HeavenTreads : AbstractTread
         if (direction != 0)
         {
             float rotationDistance = _turnRate * (float)base.TimeManager.TickDelta;
-            _myTank.transform.Rotate(0, 0, direction * rotationDistance);
+            _tank.transform.Rotate(0, 0, direction * rotationDistance);
         }
         Vector2 retVal;
         if (!_reverse)
@@ -119,15 +87,7 @@ public class HeavenTreads : AbstractTread
             retVal = _myTank.transform.position - _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
         }
         _moving = motion > 0;
-        _tankRigidbody.MovePosition(retVal);
-    }
-
-    [Reconcile]
-    private void ReconcileMovement(ReconcileData reconcileData, bool asServer)
-    {
-        _myTank.transform.position = reconcileData.position;
-        _myTank.transform.rotation = reconcileData.rotation;
-            _currBoost = reconcileData.currBoost;
+        _tank.transform.position = retVal;
     }
 
     public override float GetCooldown()

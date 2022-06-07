@@ -80,13 +80,15 @@ public class Tank : NetworkBehaviour
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
+
+        InstanceFinder.TimeManager.OnTick += OnTick;
     }
 
     public override void OnStartNetwork()
     {
         base.OnStartNetwork();
         
-        InstanceFinder.TimeManager.OnTick += OnTick;
+        // InstanceFinder.TimeManager.OnTick += OnTick;
     }
 
     private void OnDestroy()
@@ -139,9 +141,12 @@ public class Tank : NetworkBehaviour
         _bodyComponent.OnTankTick(inputData);
         _treadComponent.OnTankTick(inputData);
 
-        NonReplicatedInput(inputData);
+        if (base.IsOwner)
+        {
+            NonReplicatedInput(inputData);
+        }
 
-        HandleWeaponRotation(inputData);
+        HandleRollback(inputData);
     }
 
     [ServerRpc]
@@ -253,46 +258,56 @@ public class Tank : NetworkBehaviour
     }
     #endregion Equipping
 
-    #region Weapon Turning
+    #region Rollback
 
-    public struct ReconcileWeaponTurnData
+    public struct ReconcileData
     {
+        public Vector3 position;
         public Quaternion rotation;
+        public Quaternion weaponRotation;
 
-        public ReconcileWeaponTurnData(Quaternion rotation)
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation)
         {
+            this.position = position;
             this.rotation = rotation;
+
+            this.weaponRotation = weaponRotation;
         }
     }
 
-    private void HandleWeaponRotation(InputData inputData)
+    private void HandleRollback(InputData inputData)
     {
         if (base.IsOwner)
         {
-            ReconcileWeaponRotation(default, false);
-            ReplicateWeaponRotation(inputData, false);
+            Reconcile(default, false);
+            Replicate(inputData, false);
         }
 
         if (base.IsServer)
         {
-            ReplicateWeaponRotation(default, true);
-            ReconcileWeaponRotation(new ReconcileWeaponTurnData(weaponContainer.transform.rotation), true);
+            Replicate(default, true);
+            Reconcile(new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation), true);
         }
     }
 
     [Replicate]
-    private void ReplicateWeaponRotation(Tank.InputData inputData, bool asServer, bool replaying = false)
+    private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        _treadComponent.HandleMovement(inputData);
+
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
     }
 
     [Reconcile]
-    private void ReconcileWeaponRotation(ReconcileWeaponTurnData reconcileData, bool asServer)
+    private void Reconcile(ReconcileData reconcileData, bool asServer)
     {
+        transform.position = reconcileData.position;
+        transform.rotation = reconcileData.rotation;
+
         weaponContainer.transform.rotation = reconcileData.rotation;
     }
-    #endregion Weapon Turning
+    #endregion Rollback
 
     public void RaiseOnHitEvent(ref float dmg)
     {

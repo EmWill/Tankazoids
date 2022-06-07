@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdaae44044276a49a52229c1597e33b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tickRate: 64
+  _tickRate: 15
   _pingInterval: 1
   _timingInterval: 2
   _physicsMode: 1
@@ -2068,7 +2068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 211a9f6ec51ddc14f908f5acc0cd0423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 9117857247562382210, guid: bdf821d51565746449aa11651d4839d8, type: 3}
+  _playerPrefab: {fileID: 2808446063702463339, guid: bdf821d51565746449aa11651d4839d8, type: 3}
   _addToDefaultScene: 1
   Spawns:
   - {fileID: 495901635}
@@ -2088,7 +2088,7 @@ MonoBehaviour:
   _attackResponseType: 1
   _ipv4BindAddress: 
   _ipv6BindAddress: 
-  _port: 25567
+  _port: 25565
   _maximumClients: 4095
   _clientAddress: localhost
   _timeout: 15

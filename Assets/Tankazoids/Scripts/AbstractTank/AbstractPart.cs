@@ -25,6 +25,8 @@ public abstract class AbstractPart : NetworkBehaviour
     // do we really need this ?
     public virtual void OnTankTick(Tank.InputData inputData) {}
 
+    public virtual void HandleMovement(Tank.InputData inputData) {}
+
     private void Awake()
     {
         CanUseAt = Time.time;
