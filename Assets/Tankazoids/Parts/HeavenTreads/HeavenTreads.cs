@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class HeavenTreads : AbstractTread
 {
+    private Tank _myTank;
     private bool _reverse = false;
     private bool _moving = false;
-  //  [SyncVar]
     private float _currBoost = 0f;
     private float _maxBoost = 1.5f;
     private float _accelTime = 1.5f;
@@ -25,6 +25,7 @@ public class HeavenTreads : AbstractTread
     public override void OnEquip(Tank tank)
     {
         base.OnEquip(tank);
+        _myTank = _tank;
 
         _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
@@ -66,7 +67,7 @@ public class HeavenTreads : AbstractTread
         if (base.IsServer)
         {
             ReplicateMovement(default, true);
-            ReconcileData reconcileData = new ReconcileData(transform.position, transform.rotation, _currBoost);
+            ReconcileData reconcileData = new ReconcileData(_myTank.transform.position, _myTank.transform.rotation, _currBoost);
             ReconcileMovement(reconcileData, true);
         }
     }
@@ -106,16 +107,16 @@ public class HeavenTreads : AbstractTread
         if (direction != 0)
         {
             float rotationDistance = _turnRate * (float)base.TimeManager.TickDelta;
-            _tank.transform.Rotate(0, 0, direction * rotationDistance);
+            _myTank.transform.Rotate(0, 0, direction * rotationDistance);
         }
         Vector2 retVal;
         if (!_reverse)
         {
-            retVal = _tank.transform.position + _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _myTank.transform.position + _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
         }
         else
         {
-            retVal = _tank.transform.position - _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _myTank.transform.position - _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
         }
         _moving = motion > 0;
         _tankRigidbody.MovePosition(retVal);
@@ -124,9 +125,9 @@ public class HeavenTreads : AbstractTread
     [Reconcile]
     private void ReconcileMovement(ReconcileData reconcileData, bool asServer)
     {
-        transform.position = reconcileData.position;
-        transform.rotation = reconcileData.rotation;
-        //_currBoost = reconcileData.currBoost;
+        _myTank.transform.position = reconcileData.position;
+        _myTank.transform.rotation = reconcileData.rotation;
+            _currBoost = reconcileData.currBoost;
     }
 
     public override float GetCooldown()
