@@ -1,5 +1,6 @@
 using FishNet.Object.Prediction;
 using FishNet.Object.Synchronizing;
+using FishNet.Serializing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,16 @@ public class HeavenTreads : AbstractTread
     private void decelerate()
     {
         _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
+    }
+
+    public override void GetReconcileData(Writer writer)
+    {
+        writer.WriteSingle(_currBoost);
+    }
+
+    public override void HandleReconcileData(Reader reader)
+    {
+        _currBoost = reader.ReadSingle();
     }
 
     public override void HandleMovement(Tank.InputData inputData)
