@@ -10,11 +10,13 @@ public class HeavenTreads : AbstractTread
     private bool _reverse = false;
     private bool _moving = false;
     private float _currBoost = 0f;
-    private float _maxBoost = 1.5f;
-    private float _accelTime = 1.5f;
-    private float _decelTime = 0.5f;
+    private float _maxBoost = 2f;
+    private float _accelTime = 2f;
+    private float _decelTime = 2f;
     private float _turnRate = 175f;
+    private float _minTurnRate = 75f;
     private float _moveRate = 5;
+    public List<Sprite> forwardSprites;
 
     private Rigidbody2D _tankRigidbody;
 
@@ -32,11 +34,11 @@ public class HeavenTreads : AbstractTread
 
     private void accelerate()
     {
-        // _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
+         _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
     }
     private void decelerate()
     {
-        // _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
+         _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
     }
 
     public override void HandleMovement(Tank.InputData inputData)
@@ -54,11 +56,11 @@ public class HeavenTreads : AbstractTread
         if (motion > 0.3f)
         {
             motion = 1f;
-            if (direction == 0)
-            {
+           // if (direction == 0)
+            //{
                 accelerate();
                 accelerating = true;
-            }
+            //}
         }
         else if (motion < -0.3f)
         {
@@ -74,17 +76,22 @@ public class HeavenTreads : AbstractTread
         }
         if (direction != 0)
         {
-            float rotationDistance = _turnRate * (float)base.TimeManager.TickDelta;
+            float currentTurnRate = _turnRate;
+            // NEED TO DECELERATE MORE SLOWLY WHEN TURNING FOR THIS TO BE GOOD (or maybe not decelerate AT ALL?)
+            currentTurnRate += (_minTurnRate - _turnRate) * (_currBoost / _maxBoost);
+            float rotationDistance = currentTurnRate * (float)base.TimeManager.TickDelta;
             _tank.transform.Rotate(0, 0, direction * rotationDistance);
         }
-        Vector2 retVal;
+        Vector3 retVal;
         if (!_reverse)
         {
-            retVal = _myTank.transform.position + _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            //retVal = _myTank.transform.position + _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _myTank.transform.position + _myTank.transform.up * ((_moveRate * motion) + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
         }
         else
         {
             retVal = _myTank.transform.position - _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal -= _myTank.transform.up * _currBoost * _moveRate;
         }
         _moving = motion > 0;
         _tank.transform.position = retVal;
