@@ -9,12 +9,14 @@ public class HeavenTreads : AbstractTread
     private Tank _myTank;
     private bool _reverse = false;
     private bool _moving = false;
-    private float _currBoost = 0f;
+
+    public float _currBoost = 0f;
+
     private float _maxBoost = 1.5f;
     private float _accelTime = 1.5f;
     private float _decelTime = 0.5f;
     private float _turnRate = 175f;
-    private float _moveRate = 5;
+    private float _moveRate = 10;
 
     private Rigidbody2D _tankRigidbody;
 
@@ -32,17 +34,15 @@ public class HeavenTreads : AbstractTread
 
     private void accelerate()
     {
-        // _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
+        _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
     }
     private void decelerate()
     {
-        // _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
+        _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
     }
 
     public override void HandleMovement(Tank.InputData inputData)
     {
-        Debug.Log((float)base.TimeManager.TickDelta);
-
         float direction = 0;
         if (inputData.directionalInput.x > 0.3f)
             direction = -1;

@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Tankazoids/Main2d.unity
     guid: 8e816afa30ba88341a50b39935ae76b8
+  - enabled: 0
+    path: Assets/FishNet/Example/All/Prediction/Transform/TransformPrediction.unity
+    guid: 23d8c720c2338a54c9787668c81290f6
   m_configObjects: {}

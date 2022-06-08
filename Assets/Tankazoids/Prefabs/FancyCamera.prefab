@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followingObject: {fileID: 0}
   mousePlayerInterpolation: 0.5
-  dampening: 0.05
+  dampening: 0.1
   maxViewPort: {x: 0.9, y: 0.9}
   myCamera: {fileID: 215421930328263920}
 --- !u!1 &7713981991888080682

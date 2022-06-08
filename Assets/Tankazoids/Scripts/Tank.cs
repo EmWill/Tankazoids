@@ -265,13 +265,16 @@ public class Tank : NetworkBehaviour
         public Vector3 position;
         public Quaternion rotation;
         public Quaternion weaponRotation;
+        public float boost;
 
-        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation)
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation, float boost)
         {
             this.position = position;
             this.rotation = rotation;
 
             this.weaponRotation = weaponRotation;
+
+            this.boost = boost;
         }
     }
 
@@ -286,14 +289,16 @@ public class Tank : NetworkBehaviour
         if (base.IsServer)
         {
             Replicate(default, true);
-            Reconcile(new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation), true);
+            Reconcile(new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation, ((HeavenTreads)_treadComponent)._currBoost), true);
         }
     }
 
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        Vector3 pos = transform.position;
         _treadComponent.HandleMovement(inputData);
+        Debug.Log("replicate : "+ (transform.position - pos).ToString());
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
@@ -302,10 +307,14 @@ public class Tank : NetworkBehaviour
     [Reconcile]
     private void Reconcile(ReconcileData reconcileData, bool asServer)
     {
+        Debug.Log("reconcile : " + (transform.position - reconcileData.position).ToString());
+
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
 
         weaponContainer.transform.rotation = reconcileData.rotation;
+
+        ((HeavenTreads)_treadComponent)._currBoost = reconcileData.boost;
     }
     #endregion Rollback
 
