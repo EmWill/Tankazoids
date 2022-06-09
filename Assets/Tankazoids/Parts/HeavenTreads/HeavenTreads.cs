@@ -1,12 +1,12 @@
 using FishNet.Object.Prediction;
 using FishNet.Object.Synchronizing;
+using FishNet.Serializing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class HeavenTreads : AbstractTread
 {
-    private Tank _myTank;
     private bool _reverse = false;
     private bool _moving = false;
     private float _currBoost = 0f;
@@ -27,11 +27,9 @@ public class HeavenTreads : AbstractTread
     public override void OnEquip(Tank tank)
     {
         base.OnEquip(tank);
-        _myTank = _tank;
 
         // _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
-
     private void accelerate()
     {
          _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
@@ -40,6 +38,7 @@ public class HeavenTreads : AbstractTread
     {
          _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
     }
+
 
     public override void HandleMovement(Tank.InputData inputData)
     {
@@ -95,6 +94,16 @@ public class HeavenTreads : AbstractTread
         }
         _moving = motion > 0;
         _tank.transform.position = retVal;
+    }
+
+    public override void GetReconcileData(Writer writer)
+    {
+        writer.WriteSingle(_currBoost);
+    }
+
+    public override void HandleReconcileData(Reader reader)
+    {
+        _currBoost = reader.ReadSingle();
     }
 
     public override float GetCooldown()

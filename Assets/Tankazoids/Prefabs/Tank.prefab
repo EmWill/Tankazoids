@@ -183,8 +183,8 @@ GameObject:
   - component: {fileID: 4331371709062039824}
   - component: {fileID: 9100817144584101192}
   - component: {fileID: 6282808310638124202}
-  - component: {fileID: 7137395013629363915}
   - component: {fileID: 3400909939688374997}
+  - component: {fileID: 2719751722378306797}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -224,7 +224,7 @@ MonoBehaviour:
   - {fileID: 4331371709062039824}
   - {fileID: 9100817144584101192}
   - {fileID: 6282808310638124202}
-  - {fileID: 7137395013629363915}
+  - {fileID: 2719751722378306797}
   - {fileID: 8612475030902653931}
   SceneTransformProperties:
     Position: {x: 0, y: 1, z: 0}
@@ -233,7 +233,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 15
+  _prefabId: 1
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
@@ -254,7 +254,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2808446063702463339}
   _graphicalObject: {fileID: 8955394069440702962}
   _smoothTicks: 1
-  _smoothingDuration: 0.125
+  _smoothingDuration: 0.015
   _predictionType: 0
   _rigidbody: {fileID: 0}
   _rigidbody2d: {fileID: 0}
@@ -281,12 +281,12 @@ MonoBehaviour:
     Rotation: 1
     Scale: 0
   _interpolation: 2
-  _extrapolation: 2
+  _extrapolation: 0
   _enableTeleport: 0
   _teleportThreshold: 1
   _clientAuthoritative: 0
   _sendToOwner: 0
-  _interval: 1
+  _interval: 2
   _synchronizePosition: 1
   _positionSnapping:
     X: 0
@@ -297,7 +297,7 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
-  _synchronizeScale: 1
+  _synchronizeScale: 0
   _scaleSnapping:
     X: 0
     Y: 0
@@ -324,22 +324,6 @@ MonoBehaviour:
   weaponContainer: {fileID: 1718083181954545904}
   bodyContainer: {fileID: 6561867702871784555}
   treadContainer: {fileID: 8291602885774719809}
---- !u!114 &7137395013629363915
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9117857247562382221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9efc2d2ce6377f4fa7e552f34388770, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 3
-  _addedNetworkObject: {fileID: 2808446063702463339}
-  _networkObjectCache: {fileID: 2808446063702463339}
-  fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}
 --- !u!61 &3400909939688374997
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -366,3 +350,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &2719751722378306797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9117857247562382221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9efc2d2ce6377f4fa7e552f34388770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 2808446063702463339}
+  _networkObjectCache: {fileID: 2808446063702463339}
+  fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}

@@ -2,6 +2,7 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using FishNet.Serializing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +27,7 @@ public class Tank : NetworkBehaviour
     private AbstractWeapon _weapon0Component;
     private AbstractWeapon _weapon1Component;
     private AbstractBody _bodyComponent;
-    private AbstractTread _treadComponent;
+    private AbstractTread _treadsComponent;
 
     public StatManager<float> maxHealthModifiers { get; private set; }
     public StatManager<float> moveSpeedModifiers { get; private set; }
@@ -139,7 +140,7 @@ public class Tank : NetworkBehaviour
         _weapon0Component.OnTankTick(inputData);
         // _weapon1Component.OnTankTick(inputData);
         _bodyComponent.OnTankTick(inputData);
-        _treadComponent.OnTankTick(inputData);
+        _treadsComponent.OnTankTick(inputData);
 
         if (base.IsOwner)
         {
@@ -206,14 +207,14 @@ public class Tank : NetworkBehaviour
     public void EquipTread(GameObject prefab)
     {
         GameObject oldTread = _treadObject;
-        NetworkBehaviour oldTreadComponent = _treadComponent;
+        NetworkBehaviour oldTreadComponent = _treadsComponent;
 
         _treadObject = Instantiate(prefab, treadContainer.transform);
         InstanceFinder.ServerManager.Spawn(_treadObject.GetComponent<NetworkObject>(), base.Owner);
 
-        _treadComponent = _treadObject.GetComponent<AbstractTread>();
-        _treadComponent.OnEquip(this);
-        UpdateClientTread(_treadObject, _treadComponent);
+        _treadsComponent = _treadObject.GetComponent<AbstractTread>();
+        _treadsComponent.OnEquip(this);
+        UpdateClientTread(_treadObject, _treadsComponent);
 
         if (oldTread == null)
         {
@@ -252,9 +253,9 @@ public class Tank : NetworkBehaviour
         treadObject.transform.SetParent(treadContainer.transform);
 
         _treadObject = treadObject;
-        _treadComponent = treadComponent;
+        _treadsComponent = treadComponent;
 
-        _treadComponent.OnEquip(this);
+        _treadsComponent.OnEquip(this);
     }
     #endregion Equipping
 
@@ -266,12 +267,29 @@ public class Tank : NetworkBehaviour
         public Quaternion rotation;
         public Quaternion weaponRotation;
 
-        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation)
+
+        public byte[] weapon0ReconcileData;
+        public byte[] weapon1ReconcileData;
+        public byte[] bodyReconcileData;
+        public byte[] treadsReconcileData;
+
+
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation, 
+            byte[] weapon0ReconcileData,
+            byte[] weapon1ReconcileData, 
+            byte[] bodyReconcileData,
+            byte[] treadsReconcileData
+            )
         {
             this.position = position;
             this.rotation = rotation;
 
             this.weaponRotation = weaponRotation;
+
+            this.weapon0ReconcileData = weapon0ReconcileData;
+            this.weapon1ReconcileData = weapon1ReconcileData;
+            this.bodyReconcileData = bodyReconcileData;
+            this.treadsReconcileData = treadsReconcileData;
         }
     }
 
@@ -286,14 +304,40 @@ public class Tank : NetworkBehaviour
         if (base.IsServer)
         {
             Replicate(default, true);
-            Reconcile(new ReconcileData(transform.position, transform.rotation, weaponContainer.transform.rotation), true);
+
+
+            // we could save on this allocation if we wanted to make the interface less nice... maybe we do
+            Writer weapon0Writer = new();
+            Writer weapon1Writer = new();
+            Writer bodyWriter = new();
+            Writer treadsWriter = new();
+
+            // ask the components to write their data to the writers
+            _weapon0Component.GetReconcileData(weapon0Writer);
+            // _weapon1Component.GetReconcileData(weapon1Writer);
+            _bodyComponent.GetReconcileData(bodyWriter);
+            _treadsComponent.GetReconcileData(treadsWriter);
+
+            ReconcileData reconcileData = new ReconcileData(
+                transform.position,
+                transform.rotation,
+                weaponContainer.transform.rotation,
+                weapon0Writer.GetArraySegment().Array,
+                weapon1Writer.GetArraySegment().Array,
+                bodyWriter.GetArraySegment().Array,
+                treadsWriter.GetArraySegment().Array
+                );
+
+            Reconcile(reconcileData, true);
         }
     }
 
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
-        _treadComponent.HandleMovement(inputData);
+        Vector3 pos = transform.position;
+        _treadsComponent.HandleMovement(inputData);
+        Debug.Log("replicate : "+ (transform.position - pos).ToString());
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
@@ -302,10 +346,17 @@ public class Tank : NetworkBehaviour
     [Reconcile]
     private void Reconcile(ReconcileData reconcileData, bool asServer)
     {
+        Debug.Log("reconcile : " + (transform.position - reconcileData.position).ToString());
+
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
 
         weaponContainer.transform.rotation = reconcileData.rotation;
+
+        _weapon0Component.HandleReconcileData(new Reader(reconcileData.weapon0ReconcileData, base.NetworkManager));
+        // _weapon1Component.HandleReconcileData(new Reader(reconcileData.weapon1ReconcileData, base.NetworkManager));
+        _bodyComponent.HandleReconcileData(new Reader(reconcileData.bodyReconcileData, base.NetworkManager));
+        _treadsComponent.HandleReconcileData(new Reader(reconcileData.treadsReconcileData, base.NetworkManager));
     }
     #endregion Rollback
 

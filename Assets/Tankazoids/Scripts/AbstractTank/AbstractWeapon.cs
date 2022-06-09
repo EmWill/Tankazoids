@@ -36,7 +36,7 @@ public abstract class AbstractWeapon : AbstractPart
         Destroy(proj, _timeToLive);
     }
 
-    [ObserversRpc(BufferLast = true)]
+    [ObserversRpc]
     private void AddForceToProjectile(GameObject proj, Vector2 force)
     {
         var rb = proj.GetComponent<Rigidbody2D>();
