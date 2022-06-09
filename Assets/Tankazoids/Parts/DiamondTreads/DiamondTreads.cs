@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class DiamondTreads : AbstractTread
 {
-    private float _turnRate = 175f;
-    private float _moveRate = 5;
+    private float _turnRate = 550f;
+    private float _moveRate = 17f;
 
     private Rigidbody2D _tankRigidbody;
 
