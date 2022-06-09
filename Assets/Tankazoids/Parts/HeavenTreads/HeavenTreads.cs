@@ -8,9 +8,11 @@ using UnityEngine;
 public class HeavenTreads : AbstractTread
 {
     private bool _reverse = false;
-    private bool _moving = false;
     private float _currBoost = 0f;
-    private float _maxBoost = 2f;
+    // back in the olden times, when there was a base speed that u insta accelerated to
+    //private float _maxBoost = 2f;
+    private float _maxBoost = 3f;
+    private float _maxReverse = -0.75f;
     private float _accelTime = 2f;
     private float _decelTime = 2f;
     private float _turnRate = 175f;
@@ -30,69 +32,72 @@ public class HeavenTreads : AbstractTread
 
         // _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
-    private void accelerate()
+
+    private void adjustSpeed(float targetSpeed)
     {
-         _currBoost = Mathf.Min(_maxBoost, _currBoost + (_maxBoost / _accelTime) * (float)base.TimeManager.TickDelta);
-    }
-    private void decelerate()
-    {
-         _currBoost = Mathf.Max(0f, _currBoost - (_maxBoost / _decelTime) * (float)base.TimeManager.TickDelta);
+        //this whole function is the equivalent of shoving everything in your room into the closet. make it more readable and less stupid later
+        if (targetSpeed > _currBoost)
+        {
+            float accelRate = _maxBoost / _accelTime;
+            if (_currBoost < 1f)
+            {
+                accelRate = accelRate * 2f;
+            }
+            // maybe i also mess with accelRate when you are turning
+            _currBoost = Mathf.Min(targetSpeed, _currBoost + accelRate * (float)base.TimeManager.TickDelta);
+        }
+        else if (targetSpeed < _currBoost)
+        {
+            float decelRate = _maxBoost / _decelTime;
+            if (targetSpeed != 0)
+            {
+                decelRate = decelRate * 2f;
+            }
+            _currBoost = Mathf.Max(targetSpeed, _currBoost - decelRate * (float)base.TimeManager.TickDelta);
+        }
     }
 
 
     public override void HandleMovement(Tank.InputData inputData)
     {
-        Debug.Log((float)base.TimeManager.TickDelta);
-
         float direction = 0;
         if (inputData.directionalInput.x > 0.3f)
             direction = -1;
         else if (inputData.directionalInput.x < -0.3f)
             direction = 1;
-
-        bool accelerating = false;
         float motion = inputData.directionalInput.y;
+        float targetSpeed = 0f;
         if (motion > 0.3f)
         {
-            motion = 1f;
-           // if (direction == 0)
-            //{
-                accelerate();
-                accelerating = true;
-            //}
+            targetSpeed = _maxBoost;
         }
         else if (motion < -0.3f)
         {
-            motion = -0.75f;
+            targetSpeed = _maxReverse;
         }
-        if (!accelerating)
-            decelerate();
 
         if (_reverse)
         {
-            motion = -motion;
             direction = -direction;
         }
         if (direction != 0)
         {
             float currentTurnRate = _turnRate;
-            // NEED TO DECELERATE MORE SLOWLY WHEN TURNING FOR THIS TO BE GOOD (or maybe not decelerate AT ALL?)
             currentTurnRate += (_minTurnRate - _turnRate) * (_currBoost / _maxBoost);
             float rotationDistance = currentTurnRate * (float)base.TimeManager.TickDelta;
             _tank.transform.Rotate(0, 0, direction * rotationDistance);
         }
         Vector3 retVal;
+        adjustSpeed(targetSpeed);
         if (!_reverse)
         {
-            //retVal = _myTank.transform.position + _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
-            retVal = _myTank.transform.position + _myTank.transform.up * ((_moveRate * motion) + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.position + _tank.transform.up * (_currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
         }
         else
         {
-            retVal = _myTank.transform.position - _myTank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
-            retVal -= _myTank.transform.up * _currBoost * _moveRate;
+            retVal = _tank.transform.position - _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal -= _tank.transform.up * _currBoost * _moveRate;
         }
-        _moving = motion > 0;
         _tank.transform.position = retVal;
     }
 

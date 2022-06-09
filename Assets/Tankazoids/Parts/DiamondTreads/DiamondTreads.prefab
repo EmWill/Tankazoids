@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6642910284799926326}
   - component: {fileID: 6366489090786567293}
   - component: {fileID: 5843820338109809242}
-  - component: {fileID: -1600965418425430164}
   - component: {fileID: 8033458679519913592}
   - component: {fileID: -3461197636976966752}
+  - component: {fileID: 7864781174131478746}
   m_Layer: 0
   m_Name: DiamondTreads
   m_TagString: Untagged
@@ -86,21 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-1600965418425430164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6170247899906028073}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebcbb45a9c641b3429ed2c5f8e4000be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 0
-  _addedNetworkObject: {fileID: -3461197636976966752}
-  _networkObjectCache: {fileID: -3461197636976966752}
 --- !u!64 &8033458679519913592
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -128,7 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkBehaviours:
-  - {fileID: -1600965418425430164}
+  - {fileID: 0}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -136,7 +121,22 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 12
+  _prefabId: 7
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
+--- !u!114 &7864781174131478746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6170247899906028073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 287daf7212998a04489168c0973a4ec0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: -3461197636976966752}
+  _networkObjectCache: {fileID: 0}
