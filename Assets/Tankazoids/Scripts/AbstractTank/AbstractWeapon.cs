@@ -30,6 +30,9 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - tank.transform.position;
         Vector2 target2D = new(target.x, target.y);
         GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
+        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
+        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(myCollider, bulletCollider);
         proj.GetComponent<Projectile>().Shooter = tank;
         Spawn(proj, base.Owner);
         AddForceToProjectile(proj, target2D * _shotSpeed);
@@ -39,7 +42,11 @@ public abstract class AbstractWeapon : AbstractPart
     [ObserversRpc]
     private void AddForceToProjectile(GameObject proj, Vector2 force)
     {
-        var rb = proj.GetComponent<Rigidbody2D>();
-        rb.AddForce(force);
+        //okay it's possible for a collision to happen before here DESTROYING THE OBJECT! watch out lol
+        if (proj != null)
+        {
+            var rb = proj.GetComponent<Rigidbody2D>();
+            rb.AddForce(force);
+        }
     }
 }

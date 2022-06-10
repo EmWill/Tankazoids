@@ -337,7 +337,7 @@ public class Tank : NetworkBehaviour
     {
         Vector3 pos = transform.position;
         _treadsComponent.HandleMovement(inputData);
-        Debug.Log("replicate : "+ (transform.position - pos).ToString());
+       // Debug.Log("replicate : "+ (transform.position - pos).ToString());
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
@@ -362,10 +362,11 @@ public class Tank : NetworkBehaviour
 
     public void RaiseOnHitEvent(ref float dmg)
     {
-        OnHit(ref dmg);
+        //OnHit(ref dmg);
         _health -= dmg;
         if (_health <= 0)
         {
+            Application.Quit(0);
             //TODO: u r dead.
         }
     }

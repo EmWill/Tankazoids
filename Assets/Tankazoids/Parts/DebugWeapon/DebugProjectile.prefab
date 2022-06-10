@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8722716170557939542}
   - component: {fileID: 1918144889854905933}
   - component: {fileID: -5822064554836150010}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DebugProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +61,7 @@ MonoBehaviour:
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _sendToOwner: 1
   _interval: 1
   _synchronizePosition: 1
@@ -101,7 +101,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 6
+  _prefabId: 8
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
@@ -150,7 +150,7 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7598151544206760318}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 3161068405957158709}
   - component: {fileID: 2992586105570213650}
   - component: {fileID: 9203374987549136071}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
