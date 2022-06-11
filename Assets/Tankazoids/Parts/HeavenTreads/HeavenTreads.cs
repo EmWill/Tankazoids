@@ -17,7 +17,7 @@ public class HeavenTreads : AbstractTread
     private float _decelTime = 2f;
     private float _turnRate = 175f;
     private float _minTurnRate = 75f;
-    private float _moveRate = 5;
+    private float _moveRate = 2;
     public List<Sprite> forwardSprites;
 
     private Rigidbody2D _tankRigidbody;
