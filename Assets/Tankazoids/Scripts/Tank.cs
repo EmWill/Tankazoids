@@ -398,6 +398,7 @@ public class Tank : NetworkBehaviour
     public void Die()
     {
         transform.position = Vector3.zero;
+        AddHealth(GetMaxHealth());
     }
     #endregion Health
 

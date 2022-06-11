@@ -15,6 +15,6 @@ public class DebugWeapon : AbstractWeapon
         _timeToLive = 10f;
         _shotSpeed = 200f;
         _baseCooldown = .5f;
-        projectile.GetComponent<Projectile>().BaseDamage = 10f;
+        projectile.GetComponent<Projectile>().BaseDamage = 50f;
     }
 }
