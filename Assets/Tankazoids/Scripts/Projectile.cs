@@ -19,9 +19,10 @@ public class Projectile : NetworkBehaviour
         {
             if (!tank.Equals(Shooter))
             {
+                // what if the shooter dies... :C
                 float dmg = Shooter.damageModifiers.CalculateStat(BaseDamage);
                 print(dmg + " is the damage");
-                tank.RaiseOnHitEvent(ref dmg);
+                tank.RemoveHealth(dmg);
             }
             else
             {

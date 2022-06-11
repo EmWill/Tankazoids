@@ -5,9 +5,7 @@ using UnityEngine;
 
 public abstract class AbstractBody : AbstractPart
 {
-    public abstract int GetMaxHealth();
+    public float MaxHealth;
 
-    public abstract int GetMaxAmmo();
-
-    public abstract int GetMaxHeat();
+    public float MaxHeat;
 }

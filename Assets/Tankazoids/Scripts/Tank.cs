@@ -3,6 +3,7 @@ using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using FishNet.Serializing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,15 +30,13 @@ public class Tank : NetworkBehaviour
     private AbstractBody _bodyComponent;
     private AbstractTread _treadsComponent;
 
-    public StatManager<float> maxHealthModifiers { get; private set; }
-    public StatManager<float> moveSpeedModifiers { get; private set; }
-    public StatManager<float> cooldownModifiers { get; private set; }
-    public StatManager<int> maxAmmoModifiers { get; private set; }
-    public StatManager<float> maxHeatModifiers { get; private set; }
-    public StatManager<float> damageModifiers { get; private set; }
-    public StatManager<float> speedModifiers { get; private set; }
+    public StatManager maxHealthModifiers { get; private set; }
+    public StatManager moveSpeedModifiers { get; private set; }
+    public StatManager cooldownModifiers { get; private set; }
+    public StatManager maxHeatModifiers { get; private set; }
+    public StatManager damageModifiers { get; private set; }
+    public StatManager speedModifiers { get; private set; }
 
-    private int _ammo;
     private float _heat;
     private float _health;
 
@@ -70,6 +69,7 @@ public class Tank : NetworkBehaviour
         }
     }
 
+    #region Startup
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -77,7 +77,6 @@ public class Tank : NetworkBehaviour
         maxHealthModifiers = new();
         moveSpeedModifiers = new();
         cooldownModifiers = new();
-        maxAmmoModifiers = new();
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
@@ -108,7 +107,9 @@ public class Tank : NetworkBehaviour
         EquipBody(defaultBodyPrefab);
         EquipTread(defaultTreadPrefab);
     }
+    #endregion Startup
 
+    #region Control
     private InputData GetInputData()
     {
         // todo get a reference to the camera... maybe
@@ -158,6 +159,7 @@ public class Tank : NetworkBehaviour
             _weapon0Component.ActivateAbility(inputData);
         }
     }
+    #endregion Control
 
     #region Equipping
     // todo mkae this server_spawnweapon and put equip elsewhere?
@@ -360,14 +362,81 @@ public class Tank : NetworkBehaviour
     }
     #endregion Rollback
 
-    public void RaiseOnHitEvent(ref float dmg)
+    #region Health
+    public float GetMaxHealth()
     {
-        //OnHit(ref dmg);
-        _health -= dmg;
+        return maxHealthModifiers.CalculateStat(_bodyComponent.MaxHealth);
+    }
+
+    public void AddHealth(float amount)
+    {
+        if (amount <= 0)
+        {
+            Debug.LogError("healed 0 or negative!?");
+        }
+
+        _health = Math.Max(_health + amount, GetMaxHealth());
+    }
+
+    public void RemoveHealth(float amount)
+    {
+        if (amount <= 0)
+        {
+            Debug.LogError("took 0 or negative damage!?");
+        }
+
+        _health = Math.Min(_health - amount, 0);
+
         if (_health <= 0)
         {
-            Application.Quit(0);
-            //TODO: u r dead.
+            Die();
         }
+    }
+
+    public void Die()
+    {
+        transform.position = Vector3.zero;
+    }
+    #endregion Health
+
+    #region Heat
+    public float GetMaxHeat()
+    {
+        return maxHeatModifiers.CalculateStat(_bodyComponent.MaxHeat);
+    }
+
+    public void AddHeat(float amount)
+    {
+        if (amount <= 0)
+        {
+            Debug.LogError("added 0 or negative heat!?");
+        }
+
+        _heat += amount;
+
+        if (_heat > GetMaxHeat())
+        {
+            Overheat();
+        }
+    }
+
+    public void RemoveHeat(float amount)
+    {
+        if (amount <= 0)
+        {
+            Debug.LogError("removed 0 or negative heat!?");
+        }
+
+        _heat = Math.Min(_heat - amount, 0);
+    }
+
+    public void Overheat()
+    {
+        Debug.Log("u just overheated!!");
+    }
+    #endregion Heat
+
+    public void RaiseOnHitEvent()
+    {
     }
 }

@@ -9,19 +9,4 @@ public class DebugBody : AbstractBody
     {
         throw new System.NotImplementedException();
     }
-
-    public override int GetMaxAmmo()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override int GetMaxHealth()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override int GetMaxHeat()
-    {
-        throw new System.NotImplementedException();
-    }
 }

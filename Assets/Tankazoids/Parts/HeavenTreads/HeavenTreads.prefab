@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2e85d133e8efe8f47a150f73fd09a504, type: 2}
+  - {fileID: 2100000, guid: 41ba2bd3d826b9141b46bf14bbab863d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -101,19 +101,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: -3461197636976966752}
   _networkObjectCache: {fileID: -3461197636976966752}
-  _animation:
-  - {fileID: 375049647, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -12291162, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -1042604784, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: 1634885270, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -122421293, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -483158850, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -1947160060, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -2070232249, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: -1845412595, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: 1589426813, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: 146889312, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
-  - {fileID: 1299601447, guid: 248a53d00e174c840a2eb8951a48d289, type: 3}
+  forwardSprites: []
 --- !u!64 &8033458679519913592
 MeshCollider:
   m_ObjectHideFlags: 0

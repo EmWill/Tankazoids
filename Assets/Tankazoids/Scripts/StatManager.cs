@@ -4,49 +4,45 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class StatManager<T>
+public class StatManager
 {
-    private readonly List<StatModifier<T>> _statModifiers;
-    private readonly Dictionary<T, T> _cache;
+    public float Bonus { get; private set; }
+    public float Multiplier { get; private set; }
 
     public StatManager()
     {
-        _statModifiers = new List<StatModifier<T>>();
-        _cache = new();
+        Multiplier = 1f;
+        Bonus = 0f;
     }
 
-    public void AddStatModifier(StatModifier<T> mod)
+    public StatManager(int Bonus, float Multiplier)
     {
-        _statModifiers.Add(mod);
-        _statModifiers.Sort();
-
-        // invalidate cache
-        _cache.Clear();
+        this.Bonus = Bonus;
+        this.Multiplier = Multiplier;
     }
 
-    public void RemoveStatModifier(StatModifier<T> mod)
+    public void AddMultiplier(float value)
     {
-        _statModifiers.Remove(mod);
-
-        // invalidate cache
-        _cache.Clear();
+        Multiplier *= value;
     }
 
-    public T CalculateStat(T value)
+    public void RemoveMultiplier(float value)
     {
-        if (_cache.ContainsKey(value))
-        {
-            return _cache[value];
-        }
+        Multiplier /= value;
+    }
 
-        T resultStat = value;
-        foreach (StatModifier<T> mod in _statModifiers)
-        {
-            resultStat = mod.Mod(resultStat);
-        }
+    public void AddBonus(float value)
+    {
+        Bonus += value;
+    }
 
-        _cache.Add(value, resultStat);
-        return resultStat;
+    public void RemoveBonus(float value)
+    {
+        Bonus -= value;
+    }
+
+    public float CalculateStat(float value)
+    {
+        return (value + Bonus) * Multiplier;
     }
 }
-
