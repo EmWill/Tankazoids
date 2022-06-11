@@ -82,6 +82,7 @@ public class Tank : NetworkBehaviour
         speedModifiers = new();
 
         InstanceFinder.TimeManager.OnTick += OnTick;
+        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
     }
 
     public override void OnStartNetwork()
@@ -96,6 +97,7 @@ public class Tank : NetworkBehaviour
         if (InstanceFinder.TimeManager != null)
         {
             InstanceFinder.TimeManager.OnTick -= OnTick;
+            InstanceFinder.TimeManager.OnPostTick -= OnPostTick;
         }
     }
 
