@@ -155,6 +155,35 @@ public class Tank : NetworkBehaviour
         HandleRollback(inputData);
     }
 
+    private void OnPostTick()
+    {
+        // we could save on this allocation if we wanted to make the interface less nice... maybe we do
+        Writer weapon0Writer = new();
+        Writer weapon1Writer = new();
+        Writer bodyWriter = new();
+        Writer treadsWriter = new();
+
+        // ask the components to write their data to the writers
+        _weapon0Component.GetReconcileData(weapon0Writer);
+        // _weapon1Component.GetReconcileData(weapon1Writer);
+        _bodyComponent.GetReconcileData(bodyWriter);
+        _treadsComponent.GetReconcileData(treadsWriter);
+
+        ReconcileData reconcileData = new ReconcileData(
+            transform.position,
+            transform.rotation,
+            weaponContainer.transform.rotation,
+            _rigidbody2D.velocity,
+            _rigidbody2D.angularVelocity,
+            weapon0Writer.GetArraySegment().Array,
+            weapon1Writer.GetArraySegment().Array,
+            bodyWriter.GetArraySegment().Array,
+            treadsWriter.GetArraySegment().Array
+            );
+
+        Reconcile(reconcileData, true);
+    }
+
     [ServerRpc]
     private void NonReplicatedInput(InputData inputData)
     {
@@ -273,6 +302,8 @@ public class Tank : NetworkBehaviour
         public Quaternion rotation;
         public Quaternion weaponRotation;
 
+        public Vector3 rigidbodyVelocity;
+        public float rigidbodyAngularVelocity;
 
         public byte[] weapon0ReconcileData;
         public byte[] weapon1ReconcileData;
@@ -280,7 +311,9 @@ public class Tank : NetworkBehaviour
         public byte[] treadsReconcileData;
 
 
-        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation, 
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation,
+            Vector3 rigidbodyVelocity,
+            float rigidbodyAngularVelocity,
             byte[] weapon0ReconcileData,
             byte[] weapon1ReconcileData, 
             byte[] bodyReconcileData,
@@ -289,6 +322,9 @@ public class Tank : NetworkBehaviour
         {
             this.position = position;
             this.rotation = rotation;
+
+            this.rigidbodyVelocity = rigidbodyVelocity;
+            this.rigidbodyAngularVelocity = rigidbodyAngularVelocity;
 
             this.weaponRotation = weaponRotation;
 
@@ -310,37 +346,15 @@ public class Tank : NetworkBehaviour
         if (base.IsServer)
         {
             Replicate(default, true);
-
-
-            // we could save on this allocation if we wanted to make the interface less nice... maybe we do
-            Writer weapon0Writer = new();
-            Writer weapon1Writer = new();
-            Writer bodyWriter = new();
-            Writer treadsWriter = new();
-
-            // ask the components to write their data to the writers
-            _weapon0Component.GetReconcileData(weapon0Writer);
-            // _weapon1Component.GetReconcileData(weapon1Writer);
-            _bodyComponent.GetReconcileData(bodyWriter);
-            _treadsComponent.GetReconcileData(treadsWriter);
-
-            ReconcileData reconcileData = new ReconcileData(
-                transform.position,
-                transform.rotation,
-                weaponContainer.transform.rotation,
-                weapon0Writer.GetArraySegment().Array,
-                weapon1Writer.GetArraySegment().Array,
-                bodyWriter.GetArraySegment().Array,
-                treadsWriter.GetArraySegment().Array
-                );
-
-            Reconcile(reconcileData, true);
         }
     }
 
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        _treadsComponent.DecayVelocity();
+        _treadsComponent.DecayAngularVelocity();
+
         Vector3 pos = transform.position;
         _treadsComponent.HandleMovement(inputData);
        // Debug.Log("replicate : "+ (transform.position - pos).ToString());

@@ -20,19 +20,6 @@ public class HeavenTreads : AbstractTread
     private float _moveRate = 5;
     public List<Sprite> forwardSprites;
 
-    private Rigidbody2D _tankRigidbody;
-
-    private void Awake()
-    {
-    }
-
-    public override void OnEquip(Tank tank)
-    {
-        base.OnEquip(tank);
-
-        // _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
-    }
-
     private void adjustSpeed(float targetSpeed)
     {
         //this whole function is the equivalent of shoving everything in your room into the closet. make it more readable and less stupid later
@@ -85,7 +72,7 @@ public class HeavenTreads : AbstractTread
             float currentTurnRate = _turnRate;
             currentTurnRate += (_minTurnRate - _turnRate) * (_currBoost / _maxBoost);
             float rotationDistance = currentTurnRate * (float)base.TimeManager.TickDelta;
-            _tank.transform.Rotate(0, 0, direction * rotationDistance);
+            _tankRigidbody.SetRotation(_tankRigidbody.rotation + direction * rotationDistance);
         }
         Vector3 retVal;
         adjustSpeed(targetSpeed);
@@ -98,7 +85,7 @@ public class HeavenTreads : AbstractTread
             retVal = _tank.transform.position - _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
             retVal -= _tank.transform.up * _currBoost * _moveRate;
         }
-        _tank.transform.position = retVal;
+        _tankRigidbody.MovePosition(retVal);
     }
 
     public override void GetReconcileData(Writer writer)
