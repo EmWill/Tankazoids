@@ -30,18 +30,18 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - tank.transform.position;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
         GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
-        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
-        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
-        IgnoreOwnTank(myCollider, bulletCollider);
         proj.GetComponent<Projectile>().Shooter = tank;
         Spawn(proj, base.Owner);
+        IgnoreOwnTank(tank, proj);
         AddForceToProjectile(proj, target2D * _shotSpeed);
         Destroy(proj, _timeToLive);
     }
 
     [ObserversRpc]
-    private void IgnoreOwnTank(Collider2D myCollider, Collider2D bulletCollider)
+    private void IgnoreOwnTank(Tank tank, GameObject proj)
     {
+        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
+        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(myCollider, bulletCollider);
     }
 
