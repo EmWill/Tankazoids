@@ -106,6 +106,8 @@ public class Tank : NetworkBehaviour
         EquipWeapon0(defaultWeapon0Prefab);
         EquipBody(defaultBodyPrefab);
         EquipTread(defaultTreadPrefab);
+
+        _health = GetMaxHealth();
     }
     #endregion Startup
 
