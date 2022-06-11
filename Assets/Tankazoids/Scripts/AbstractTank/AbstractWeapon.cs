@@ -28,7 +28,7 @@ public abstract class AbstractWeapon : AbstractPart
     protected virtual void Ability(Tank.InputData inputData, Tank tank)
     {
         Vector3 target = inputData.worldTargetPos - tank.transform.position;
-        Vector2 target2D = new(target.x, target.y);
+        Vector2 target2D = new Vector2(target.x, target.y).normalized;
         GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
         BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
         Collider2D bulletCollider = proj.GetComponent<Collider2D>();
