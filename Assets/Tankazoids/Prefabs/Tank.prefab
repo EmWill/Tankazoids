@@ -255,10 +255,10 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2808446063702463339}
   _graphicalObject: {fileID: 8955394069440702962}
   _smoothTicks: 1
-  _smoothingDuration: 0.015
-  _predictionType: 0
+  _smoothingDuration: 0.01
+  _predictionType: 2
   _rigidbody: {fileID: 0}
-  _rigidbody2d: {fileID: 0}
+  _rigidbody2d: {fileID: 563424042169602029}
   _networkTransform: {fileID: 9100817144584101192}
   _predictionRatio: 0
 --- !u!114 &9100817144584101192
