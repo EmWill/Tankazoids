@@ -23,7 +23,7 @@ public abstract class AbstractTread : AbstractPart
         }
         else
         {
-            _tankRigidbody.velocity -= _tankRigidbody.velocity * 0.3f * (float)base.TimeManager.TickDelta;
+            _tankRigidbody.velocity -= _tankRigidbody.velocity * 0.75f * (float)base.TimeManager.TickDelta;
         }
     }
 
@@ -35,7 +35,7 @@ public abstract class AbstractTread : AbstractPart
         }
         else
         {
-            _tankRigidbody.angularVelocity -= _tankRigidbody.angularVelocity * 0.3f * (float)base.TimeManager.TickDelta;
+            _tankRigidbody.angularVelocity -= _tankRigidbody.angularVelocity * 0.75f * (float)base.TimeManager.TickDelta;
         }
     }
 }
