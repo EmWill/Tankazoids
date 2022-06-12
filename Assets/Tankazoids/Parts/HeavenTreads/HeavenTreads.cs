@@ -76,14 +76,16 @@ public class HeavenTreads : AbstractTread
         }
         Vector3 retVal;
         adjustSpeed(targetSpeed);
+
+        float calculatedMoveRate = _tank.speedModifiers.CalculateStat(_moveRate);
         if (!_reverse)
         {
-            retVal = _tank.transform.position + _tank.transform.up * (_currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.position + _tank.transform.up * (_currBoost * calculatedMoveRate) * (float)base.TimeManager.TickDelta;
         }
         else
         {
-            retVal = _tank.transform.position - _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
-            retVal -= _tank.transform.up * _currBoost * _moveRate;
+            retVal = _tank.transform.position - _tank.transform.up * motion * (calculatedMoveRate + _currBoost * calculatedMoveRate) * (float)base.TimeManager.TickDelta;
+            retVal -= _tank.transform.up * _currBoost * calculatedMoveRate;
         }
         _tankRigidbody.MovePosition(retVal);
     }
