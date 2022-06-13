@@ -35,6 +35,10 @@ public abstract class AbstractWeapon : AbstractPart
         IgnoreOwnTank(tank, proj);
         AddForceToProjectile(proj, target2D * _shotSpeed);
         Destroy(proj, _timeToLive);
+
+        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
+        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(myCollider, bulletCollider);
     }
 
     [ObserversRpc]

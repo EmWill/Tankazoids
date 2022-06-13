@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 6282808310638124202}
   - component: {fileID: 3400909939688374997}
   - component: {fileID: 2719751722378306797}
-  - component: {fileID: 9015705416470171435}
+  - component: {fileID: 563424042169602029}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -255,10 +255,10 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2808446063702463339}
   _graphicalObject: {fileID: 8955394069440702962}
   _smoothTicks: 1
-  _smoothingDuration: 0.015
-  _predictionType: 0
+  _smoothingDuration: 0.01
+  _predictionType: 2
   _rigidbody: {fileID: 0}
-  _rigidbody2d: {fileID: 0}
+  _rigidbody2d: {fileID: 563424042169602029}
   _networkTransform: {fileID: 9100817144584101192}
   _predictionRatio: 0
 --- !u!114 &9100817144584101192
@@ -367,7 +367,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 2808446063702463339}
   _networkObjectCache: {fileID: 2808446063702463339}
   fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}
---- !u!50 &9015705416470171435
+--- !u!50 &563424042169602029
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -381,10 +381,10 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0

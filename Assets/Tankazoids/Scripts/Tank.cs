@@ -40,6 +40,8 @@ public class Tank : NetworkBehaviour
     private float _heat;
     private float _health;
 
+    private bool _sprinting = false;
+
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
@@ -55,8 +57,9 @@ public class Tank : NetworkBehaviour
         public bool weapon1Pressed;
         public bool bodyPressed;
         public bool treadPressed;
+        public bool sprintPressed;
 
-        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed)
+        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed, bool sprintPressed)
         {
             this.worldTargetPos = worldTargetPos;
 
@@ -66,6 +69,7 @@ public class Tank : NetworkBehaviour
             this.weapon1Pressed = weapon1Pressed;
             this.bodyPressed = bodyPressed;
             this.treadPressed = treadPressed;
+            this.sprintPressed = sprintPressed;
         }
     }
 
@@ -82,6 +86,7 @@ public class Tank : NetworkBehaviour
         speedModifiers = new();
 
         InstanceFinder.TimeManager.OnTick += OnTick;
+        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
     }
 
     public override void OnStartNetwork()
@@ -96,6 +101,7 @@ public class Tank : NetworkBehaviour
         if (InstanceFinder.TimeManager != null)
         {
             InstanceFinder.TimeManager.OnTick -= OnTick;
+            InstanceFinder.TimeManager.OnPostTick -= OnPostTick;
         }
     }
 
@@ -133,7 +139,8 @@ public class Tank : NetworkBehaviour
                 Input.GetButton("Weapon0"),
                 Input.GetButton("Weapon1"),
                 Input.GetButton("Body"),
-                Input.GetButton("Tread")
+                Input.GetButton("Tread"),
+                Input.GetButton("Sprint")
             );
     }
 
@@ -145,12 +152,55 @@ public class Tank : NetworkBehaviour
         _bodyComponent.OnTankTick(inputData);
         _treadsComponent.OnTankTick(inputData);
 
+        if (inputData.sprintPressed != _sprinting)
+        {
+            if (inputData.sprintPressed)
+            {
+                speedModifiers.AddMultiplier(2f);
+                _sprinting = true;
+            } else
+            {
+                speedModifiers.RemoveMultiplier(2f);
+                _sprinting = false;
+            }
+        }
+
         if (base.IsOwner)
         {
             NonReplicatedInput(inputData);
         }
 
         HandleRollback(inputData);
+    }
+
+    private void OnPostTick()
+    {
+        // we could save on this allocation if we wanted to make the interface less nice... maybe we do
+        Writer weapon0Writer = new();
+        Writer weapon1Writer = new();
+        Writer bodyWriter = new();
+        Writer treadsWriter = new();
+
+        // ask the components to write their data to the writers
+        _weapon0Component.GetReconcileData(weapon0Writer);
+        // _weapon1Component.GetReconcileData(weapon1Writer);
+        _bodyComponent.GetReconcileData(bodyWriter);
+        _treadsComponent.GetReconcileData(treadsWriter);
+
+        ReconcileData reconcileData = new ReconcileData(
+            transform.position,
+            transform.rotation,
+            weaponContainer.transform.rotation,
+            _rigidbody2D.velocity,
+            _rigidbody2D.angularVelocity,
+            speedModifiers,
+            weapon0Writer.GetArraySegment().Array,
+            weapon1Writer.GetArraySegment().Array,
+            bodyWriter.GetArraySegment().Array,
+            treadsWriter.GetArraySegment().Array
+            );
+
+        Reconcile(reconcileData, true);
     }
 
     [ServerRpc]
@@ -271,14 +321,20 @@ public class Tank : NetworkBehaviour
         public Quaternion rotation;
         public Quaternion weaponRotation;
 
+        public Vector3 rigidbodyVelocity;
+        public float rigidbodyAngularVelocity;
+
+        public StatManager speedModifiers;
 
         public byte[] weapon0ReconcileData;
         public byte[] weapon1ReconcileData;
         public byte[] bodyReconcileData;
         public byte[] treadsReconcileData;
 
-
         public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation,
+            Vector3 rigidbodyVelocity,
+            float rigidbodyAngularVelocity,
+            StatManager speedModifiers,
             byte[] weapon0ReconcileData,
             byte[] weapon1ReconcileData, 
             byte[] bodyReconcileData,
@@ -287,6 +343,11 @@ public class Tank : NetworkBehaviour
         {
             this.position = position;
             this.rotation = rotation;
+
+            this.rigidbodyVelocity = rigidbodyVelocity;
+            this.rigidbodyAngularVelocity = rigidbodyAngularVelocity;
+
+            this.speedModifiers = speedModifiers;
 
             this.weaponRotation = weaponRotation;
 
@@ -308,40 +369,17 @@ public class Tank : NetworkBehaviour
         if (base.IsServer)
         {
             Replicate(default, true);
-
-
-            // we could save on this allocation if we wanted to make the interface less nice... maybe we do
-            Writer weapon0Writer = new();
-            Writer weapon1Writer = new();
-            Writer bodyWriter = new();
-            Writer treadsWriter = new();
-
-            // ask the components to write their data to the writers
-            _weapon0Component.GetReconcileData(weapon0Writer);
-            // _weapon1Component.GetReconcileData(weapon1Writer);
-            _bodyComponent.GetReconcileData(bodyWriter);
-            _treadsComponent.GetReconcileData(treadsWriter);
-
-            ReconcileData reconcileData = new ReconcileData(
-                transform.position,
-                transform.rotation,
-                weaponContainer.transform.rotation,
-                weapon0Writer.GetArraySegment().Array,
-                weapon1Writer.GetArraySegment().Array,
-                bodyWriter.GetArraySegment().Array,
-                treadsWriter.GetArraySegment().Array
-                );
-
-            Reconcile(reconcileData, true);
         }
     }
 
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        _treadsComponent.DecayVelocity();
+        _treadsComponent.DecayAngularVelocity();
+
         Vector3 pos = transform.position;
         _treadsComponent.HandleMovement(inputData);
-       // Debug.Log("replicate : "+ (transform.position - pos).ToString());
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
@@ -350,10 +388,10 @@ public class Tank : NetworkBehaviour
     [Reconcile]
     private void Reconcile(ReconcileData reconcileData, bool asServer)
     {
-        Debug.Log("reconcile : " + (transform.position - reconcileData.position).ToString());
-
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
+
+        speedModifiers = reconcileData.speedModifiers;
 
         weaponContainer.transform.rotation = reconcileData.rotation;
 
