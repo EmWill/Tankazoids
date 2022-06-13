@@ -52,6 +52,7 @@ public class HeavenTreads : AbstractTread
 
     public override void HandleMovement(Tank.InputData inputData)
     {
+        float _moveRate = _tank.speedModifiers.CalculateStat(this._moveRate);
         float direction = 0;
         if (inputData.directionalInput.x > 0.3f)
             direction = -1;
