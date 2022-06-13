@@ -12,10 +12,11 @@ public class HeavenTreads : AbstractTread
     // back in the olden times, when there was a base speed that u insta accelerated to
     //private float _maxBoost = 2f;
     private float _maxBoost = 3f;
-    private float _maxReverse = -0.75f;
+    private float _maxReverse = -1.5f;
     private float _accelTime = 2f;
     private float _decelTime = 2f;
-    private float _turnRate = 175f;
+    // private float _turnRate = 175f;
+    private float _turnRate = 215f;
     private float _minTurnRate = 75f;
     private float _moveRate = 2;
     public List<Sprite> forwardSprites;
@@ -36,9 +37,13 @@ public class HeavenTreads : AbstractTread
         else if (targetSpeed < _currBoost)
         {
             float decelRate = _maxBoost / _decelTime;
-            if (targetSpeed != 0)
+            if (targetSpeed < 0)
             {
                 decelRate = decelRate * 2f;
+            }
+            else
+            {
+                decelRate = decelRate / 2f;
             }
             _currBoost = Mathf.Max(targetSpeed, _currBoost - decelRate * (float)base.TimeManager.TickDelta);
         }
@@ -70,24 +75,25 @@ public class HeavenTreads : AbstractTread
         if (direction != 0)
         {
             float currentTurnRate = _turnRate;
-            currentTurnRate += (_minTurnRate - _turnRate) * (_currBoost / _maxBoost);
+            currentTurnRate += (_minTurnRate - _turnRate) * (Mathf.Abs(_currBoost) / _maxBoost);
             float rotationDistance = currentTurnRate * (float)base.TimeManager.TickDelta;
             _tankRigidbody.SetRotation(_tankRigidbody.rotation + direction * rotationDistance);
         }
         Vector3 retVal;
         adjustSpeed(targetSpeed);
-
-        float calculatedMoveRate = _tank.speedModifiers.CalculateStat(_moveRate);
         if (!_reverse)
         {
-            retVal = _tank.transform.position + _tank.transform.up * (_currBoost * calculatedMoveRate) * (float)base.TimeManager.TickDelta;
+            //retVal = _tank.transform.position + _tank.transform.up * (_currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.up * (_currBoost * _moveRate);
         }
         else
         {
-            retVal = _tank.transform.position - _tank.transform.up * motion * (calculatedMoveRate + _currBoost * calculatedMoveRate) * (float)base.TimeManager.TickDelta;
-            retVal -= _tank.transform.up * _currBoost * calculatedMoveRate;
+            //retVal = _tank.transform.position - _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate) * (float)base.TimeManager.TickDelta;
+            retVal = _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate);
+            retVal -= _tank.transform.up * _currBoost * _moveRate;
         }
-        _tankRigidbody.MovePosition(retVal);
+        _tankRigidbody.velocity = retVal;
+        //_tank.transform.position = retVal;
     }
 
     public override void GetReconcileData(Writer writer)
