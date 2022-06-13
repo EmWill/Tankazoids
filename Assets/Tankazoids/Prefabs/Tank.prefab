@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 6282808310638124202}
   - component: {fileID: 3400909939688374997}
   - component: {fileID: 2719751722378306797}
+  - component: {fileID: 9015705416470171435}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -366,3 +367,24 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 2808446063702463339}
   _networkObjectCache: {fileID: 2808446063702463339}
   fancyCameraPrefab: {fileID: 4579602345257652077, guid: 9039208797cdbe049adb33d4519f0172, type: 3}
+--- !u!50 &9015705416470171435
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9117857247562382221}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

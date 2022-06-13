@@ -270,6 +270,7 @@ public class Tank : NetworkBehaviour
         public Vector3 position;
         public Quaternion rotation;
         public Quaternion weaponRotation;
+        public Vector2 velocity;
 
 
         public byte[] weapon0ReconcileData;
@@ -278,7 +279,7 @@ public class Tank : NetworkBehaviour
         public byte[] treadsReconcileData;
 
 
-        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation, 
+        public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation, Vector2 velocity,
             byte[] weapon0ReconcileData,
             byte[] weapon1ReconcileData, 
             byte[] bodyReconcileData,
@@ -287,6 +288,7 @@ public class Tank : NetworkBehaviour
         {
             this.position = position;
             this.rotation = rotation;
+            this.velocity = velocity;
 
             this.weaponRotation = weaponRotation;
 
@@ -326,6 +328,7 @@ public class Tank : NetworkBehaviour
                 transform.position,
                 transform.rotation,
                 weaponContainer.transform.rotation,
+                _rigidbody2D.velocity,
                 weapon0Writer.GetArraySegment().Array,
                 weapon1Writer.GetArraySegment().Array,
                 bodyWriter.GetArraySegment().Array,
@@ -352,6 +355,7 @@ public class Tank : NetworkBehaviour
     {
         Debug.Log("reconcile : " + (transform.position - reconcileData.position).ToString());
 
+        _rigidbody2D.velocity = reconcileData.velocity;
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
 
