@@ -15,6 +15,11 @@ public class CameraDirectorController : MonoBehaviour
 
     void Update()
     {
+        if (followingObject == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Vector3 viewPortCoords = myCamera.ScreenToViewportPoint(Input.mousePosition);
 
         // we gotta clamp the view port coords or else multi montitor setups would be op!!!

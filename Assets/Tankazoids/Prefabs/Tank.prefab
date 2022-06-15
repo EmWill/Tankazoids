@@ -321,7 +321,7 @@ MonoBehaviour:
   defaultWeapon0Prefab: {fileID: 5509078380185883884, guid: e0b7281f02c3e4c4cad6a2da98ae67e3, type: 3}
   defaultWeapon1Prefab: {fileID: 5509078380185883884, guid: e0b7281f02c3e4c4cad6a2da98ae67e3, type: 3}
   defaultBodyPrefab: {fileID: 1501870720023411529, guid: 0ebc1d0f04d271d4ebe082e9b6511c8c, type: 3}
-  defaultTreadPrefab: {fileID: 6170247899906028073, guid: 2713988caeab4ea43a534cd96653c7e6, type: 3}
+  defaultTreadPrefab: {fileID: 6170247899906028073, guid: b2e5d61dde4abbd44ab7c2dcdee697ca, type: 3}
   weaponContainer: {fileID: 1718083181954545904}
   bodyContainer: {fileID: 6561867702871784555}
   treadContainer: {fileID: 8291602885774719809}
