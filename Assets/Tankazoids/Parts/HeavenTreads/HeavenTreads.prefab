@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6366489090786567293}
   - component: {fileID: 5843820338109809242}
   - component: {fileID: -1600965418425430164}
-  - component: {fileID: 8033458679519913592}
   - component: {fileID: -3461197636976966752}
   m_Layer: 0
   m_Name: HeavenTreads
@@ -102,20 +101,6 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: -3461197636976966752}
   _networkObjectCache: {fileID: -3461197636976966752}
   forwardSprites: []
---- !u!64 &8033458679519913592
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6170247899906028073}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &-3461197636976966752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +122,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 12
+  _prefabId: 6
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []

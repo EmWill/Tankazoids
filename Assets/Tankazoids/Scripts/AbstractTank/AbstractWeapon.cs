@@ -30,33 +30,30 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - tank.transform.position;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
         GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
-        proj.GetComponent<Projectile>().Shooter = tank;
         Spawn(proj, base.Owner);
-        IgnoreOwnTank(tank, proj);
-        AddForceToProjectile(proj, target2D * _shotSpeed);
         Destroy(proj, _timeToLive);
 
-        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
-        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
-        Physics2D.IgnoreCollision(myCollider, bulletCollider);
+        // herm... the velocity of the rigidbody gets synced
+        Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
+        rb.velocity = target2D * _shotSpeed;
+
+        PrepareProjectile(proj, target2D);
     }
 
-    [ObserversRpc]
-    private void IgnoreOwnTank(Tank tank, GameObject proj)
-    {
-        BoxCollider2D myCollider = tank.GetComponent<BoxCollider2D>();
-        Collider2D bulletCollider = proj.GetComponent<Collider2D>();
-        Physics2D.IgnoreCollision(myCollider, bulletCollider);
-    }
-
-    [ObserversRpc]
-    private void AddForceToProjectile(GameObject proj, Vector2 force)
+    // we may want to bufferlast here herm... thinking
+    [ObserversRpc(RunLocally = true)]
+    private void PrepareProjectile(GameObject proj, Vector2 direction)
     {
         //okay it's possible for a collision to happen before here DESTROYING THE OBJECT! watch out lol
         if (proj != null)
         {
-            var rb = proj.GetComponent<Rigidbody2D>();
-            rb.AddForce(force);
+            BoxCollider2D myCollider = _tank.GetComponent<BoxCollider2D>();
+            Collider2D bulletCollider = proj.GetComponent<Collider2D>();
+            Physics2D.IgnoreCollision(myCollider, bulletCollider);
+
+            proj.GetComponent<Projectile>().Shooter = _tank;
+
+            bulletCollider.enabled = true;
         }
     }
 }
