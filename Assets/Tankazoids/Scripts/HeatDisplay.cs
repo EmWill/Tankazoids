@@ -16,6 +16,7 @@ public class HeatDisplay : MonoBehaviour
 
     void Update()
     {
+        if (tankUIManager.tank == null) return;
         _textComponent.SetText($"{tankUIManager.tank.GetHeat():0.00}% / {tankUIManager.tank.GetMaxHeat():0.00}%");
     }
 }

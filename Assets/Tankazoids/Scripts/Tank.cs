@@ -47,6 +47,8 @@ public class Tank : NetworkBehaviour
     private bool _sprinting = false;
     private bool _dead = false;
 
+    private MapManager _mapManager;
+
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
@@ -422,11 +424,13 @@ public class Tank : NetworkBehaviour
     {
         return _health;
     }
+
     public float GetMaxHealth()
     {
         return maxHealthModifiers.CalculateStat(_bodyComponent.MaxHealth);
     }
 
+    [Server]
     public void AddHealth(float amount)
     {
         if (amount <= 0)
@@ -438,6 +442,7 @@ public class Tank : NetworkBehaviour
         _health = Math.Min(_health + amount, GetMaxHealth());
     }
 
+    [Server]
     public void RemoveHealth(float amount)
     {
         if (amount <= 0)
@@ -453,13 +458,14 @@ public class Tank : NetworkBehaviour
         }
     }
 
+    [Server]
     public void Die()
     {
-        //transform.position = Vector3.zero;
-        //AddHealth(GetMaxHealth());
-        if (!_dead)                         //this is so scuffed and bad. i think this is client authoratative
-        _mapManager.respawn(this);
-        _dead = true;
+        if (!_dead && base.IsServer)
+        {
+            _mapManager.Respawn(this);
+            _dead = true;
+        }
     }
     #endregion Health
 
@@ -474,6 +480,7 @@ public class Tank : NetworkBehaviour
         return maxHeatModifiers.CalculateStat(_bodyComponent.MaxHeat);
     }
 
+    [Server]
     public void AddHeat(float amount)
     {
         if (amount <= 0)
@@ -489,6 +496,7 @@ public class Tank : NetworkBehaviour
         }
     }
 
+    [Server]
     public void RemoveHeat(float amount)
     {
         if (amount <= 0)
@@ -499,6 +507,7 @@ public class Tank : NetworkBehaviour
         _heat = Math.Max(_heat - amount, 0);
     }
 
+    [Server]
     public void Overheat()
     {
         Debug.Log("u just overheated!!");

@@ -15,6 +15,7 @@ public class HealthDisplay : MonoBehaviour
     }
     void Update()
     {
+        if (tankUIManager.tank == null) return;
         _textComponent.SetText($"{tankUIManager.tank.GetHealth():0.00}% / {tankUIManager.tank.GetMaxHealth():0.00}%");
     }
 }
