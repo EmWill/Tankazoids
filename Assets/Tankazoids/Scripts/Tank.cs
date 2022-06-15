@@ -45,6 +45,7 @@ public class Tank : NetworkBehaviour
     private float _health;
 
     private bool _sprinting = false;
+    private bool _dead = false;
 
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
@@ -107,6 +108,11 @@ public class Tank : NetworkBehaviour
             InstanceFinder.TimeManager.OnTick -= OnTick;
             InstanceFinder.TimeManager.OnPostTick -= OnPostTick;
         }
+    }
+
+    public void setMapManager(MapManager manager)
+    {
+        _mapManager = manager;
     }
 
     public override void OnStartServer()
@@ -198,6 +204,7 @@ public class Tank : NetworkBehaviour
             rigidbody2d.velocity,
             rigidbody2d.angularVelocity,
             speedModifiers,
+
             weapon0Writer.GetArraySegment().Array,
             weapon1Writer.GetArraySegment().Array,
             bodyWriter.GetArraySegment().Array,
@@ -379,6 +386,10 @@ public class Tank : NetworkBehaviour
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        if (inputData.bodyPressed)
+        {
+            RemoveHealth(999);
+        }
         _treadsComponent.DecayVelocity();
         _treadsComponent.DecayAngularVelocity();
 
@@ -421,6 +432,7 @@ public class Tank : NetworkBehaviour
         if (amount <= 0)
         {
             Debug.LogError("healed 0 or negative!?");
+            Debug.LogError("doggy doggy WHAT now!?");
         }
 
         _health = Math.Min(_health + amount, GetMaxHealth());
@@ -443,8 +455,11 @@ public class Tank : NetworkBehaviour
 
     public void Die()
     {
-        transform.position = Vector3.zero;
-        AddHealth(GetMaxHealth());
+        //transform.position = Vector3.zero;
+        //AddHealth(GetMaxHealth());
+        if (!_dead)                         //this is so scuffed and bad. i think this is client authoratative
+        _mapManager.respawn(this);
+        _dead = true;
     }
     #endregion Health
 
