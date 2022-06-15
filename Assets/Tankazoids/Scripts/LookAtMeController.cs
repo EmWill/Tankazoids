@@ -10,8 +10,6 @@ public class LookAtMeController : NetworkBehaviour
     {
         base.OnStartClient();
 
-        Debug.Log("wubba lubba dub dub");
-
         if (base.IsOwner)
         {
             GameObject cameraPrefab = Instantiate(fancyCameraPrefab, Vector3.zero, Quaternion.identity);

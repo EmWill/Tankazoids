@@ -2,6 +2,7 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using FishNet.Object.Synchronizing;
 using FishNet.Serializing;
 using System;
 using System.Collections;
@@ -37,7 +38,10 @@ public class Tank : NetworkBehaviour
     public StatManager damageModifiers { get; private set; }
     public StatManager speedModifiers { get; private set; }
 
+    [SyncVar]
     private float _heat;
+
+    [SyncVar]
     private float _health;
 
     private bool _sprinting = false;
@@ -45,7 +49,7 @@ public class Tank : NetworkBehaviour
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
-    private Rigidbody2D _rigidbody2D;
+    public Rigidbody2D rigidbody2d { get; private set; }
 
     public struct InputData
     {
@@ -76,7 +80,7 @@ public class Tank : NetworkBehaviour
     #region Startup
     private void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
+        rigidbody2d = GetComponent<Rigidbody2D>();
 
         maxHealthModifiers = new();
         moveSpeedModifiers = new();
@@ -191,8 +195,8 @@ public class Tank : NetworkBehaviour
             transform.position,
             transform.rotation,
             weaponContainer.transform.rotation,
-            _rigidbody2D.velocity,
-            _rigidbody2D.angularVelocity,
+            rigidbody2d.velocity,
+            rigidbody2d.angularVelocity,
             speedModifiers,
             weapon0Writer.GetArraySegment().Array,
             weapon1Writer.GetArraySegment().Array,
@@ -403,6 +407,10 @@ public class Tank : NetworkBehaviour
     #endregion Rollback
 
     #region Health
+    public float GetHealth()
+    {
+        return _health;
+    }
     public float GetMaxHealth()
     {
         return maxHealthModifiers.CalculateStat(_bodyComponent.MaxHealth);
@@ -415,7 +423,7 @@ public class Tank : NetworkBehaviour
             Debug.LogError("healed 0 or negative!?");
         }
 
-        _health = Math.Max(_health + amount, GetMaxHealth());
+        _health = Math.Min(_health + amount, GetMaxHealth());
     }
 
     public void RemoveHealth(float amount)
@@ -425,7 +433,7 @@ public class Tank : NetworkBehaviour
             Debug.LogError("took 0 or negative damage!?");
         }
 
-        _health = Math.Min(_health - amount, 0);
+        _health = Math.Max(_health - amount, 0);
 
         if (_health <= 0)
         {
@@ -441,6 +449,11 @@ public class Tank : NetworkBehaviour
     #endregion Health
 
     #region Heat
+    public float GetHeat()
+    {
+        return _heat;
+    }
+
     public float GetMaxHeat()
     {
         return maxHeatModifiers.CalculateStat(_bodyComponent.MaxHeat);
@@ -468,7 +481,7 @@ public class Tank : NetworkBehaviour
             Debug.LogError("removed 0 or negative heat!?");
         }
 
-        _heat = Math.Min(_heat - amount, 0);
+        _heat = Math.Max(_heat - amount, 0);
     }
 
     public void Overheat()

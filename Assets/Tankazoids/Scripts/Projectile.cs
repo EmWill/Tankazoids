@@ -10,11 +10,9 @@ public class Projectile : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        print("what the hell idiots");
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        print("hell yes brother");
         if (collision.gameObject.TryGetComponent(out Tank tank))
         {
             if (!tank.Equals(Shooter))
