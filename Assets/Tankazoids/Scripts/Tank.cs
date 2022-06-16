@@ -99,8 +99,6 @@ public class Tank : NetworkBehaviour
 
         InstanceFinder.TimeManager.OnTick += OnTick;
         InstanceFinder.TimeManager.OnPostTick += OnPostTick;
-
-        // if (base.IsServer) rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
 
     private void OnDestroy()
@@ -126,6 +124,8 @@ public class Tank : NetworkBehaviour
         EquipTread(defaultTreadPrefab);
 
         _health = GetMaxHealth();
+
+        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
     #endregion Lifecycle
 
@@ -402,6 +402,7 @@ public class Tank : NetworkBehaviour
         _treadsComponent.DecayVelocity();
         _treadsComponent.DecayAngularVelocity();
 
+        Vector3 pos = transform.position;
         _treadsComponent.HandleMovement(inputData);
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
@@ -413,9 +414,6 @@ public class Tank : NetworkBehaviour
     {
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
-
-        rigidbody2d.velocity = reconcileData.rigidbodyVelocity;
-        rigidbody2d.angularVelocity = reconcileData.rigidbodyAngularVelocity;
 
         speedModifiers = reconcileData.speedModifiers;
 

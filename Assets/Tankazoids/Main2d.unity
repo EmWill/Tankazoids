@@ -581,7 +581,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tickRate: 64
   _pingInterval: 1
-  _timingInterval: 2
+  _timingInterval: 1
   _physicsMode: 1
   _maximumBufferedInputs: 15
 --- !u!1 &259974205
