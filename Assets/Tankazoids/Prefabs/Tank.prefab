@@ -257,7 +257,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2808446063702463339}
   _graphicalObject: {fileID: 8955394069440702962}
   _smoothTicks: 1
-  _smoothingDuration: 0.01
+  _smoothingDuration: 0.02
   _predictionType: 2
   _rigidbody: {fileID: 0}
   _rigidbody2d: {fileID: 563424042169602029}
