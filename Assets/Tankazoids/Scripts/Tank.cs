@@ -415,6 +415,9 @@ public class Tank : NetworkBehaviour
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
 
+        rigidbody2d.velocity = reconcileData.rigidbodyVelocity;
+        rigidbody2d.angularVelocity = reconcileData.rigidbodyAngularVelocity;
+
         speedModifiers = reconcileData.speedModifiers;
 
         weaponContainer.transform.rotation = reconcileData.rotation;
