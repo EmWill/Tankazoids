@@ -177,6 +177,11 @@ public class Tank : NetworkBehaviour
             }
         }
 
+        if (inputData.bodyPressed && TimeManager.LocalTick % 20 == 0)
+        {
+            RemoveHealth(999);
+        }
+
         if (base.IsOwner)
         {
             if (inputData.weapon0Pressed)
@@ -392,10 +397,6 @@ public class Tank : NetworkBehaviour
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
-        if (inputData.bodyPressed)
-        {
-            RemoveHealth(999);
-        }
         _treadsComponent.DecayVelocity();
         _treadsComponent.DecayAngularVelocity();
 
