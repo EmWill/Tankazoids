@@ -37,12 +37,12 @@ public abstract class AbstractWeapon : AbstractPart
         Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
         rb.velocity = target2D * _shotSpeed;
 
-        PrepareProjectile(proj, target2D);
+        PrepareProjectile(proj);
     }
 
     // we may want to bufferlast here herm... thinking
     [ObserversRpc(RunLocally = true)]
-    private void PrepareProjectile(GameObject proj, Vector2 direction)
+    private void PrepareProjectile(GameObject proj)
     {
         //okay it's possible for a collision to happen before here DESTROYING THE OBJECT! watch out lol
         if (proj != null)

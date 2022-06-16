@@ -8,9 +8,13 @@ public class Projectile : NetworkBehaviour
     public Tank Shooter;
     public float BaseDamage;
 
-    private void OnCollisionEnter(Collision collision)
+    public override void OnStartServer()
     {
+        base.OnStartServer();
+
+        GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.TryGetComponent(out Tank tank))

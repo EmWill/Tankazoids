@@ -124,6 +124,8 @@ public class Tank : NetworkBehaviour
         EquipTread(defaultTreadPrefab);
 
         _health = GetMaxHealth();
+
+        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
     #endregion Lifecycle
 
