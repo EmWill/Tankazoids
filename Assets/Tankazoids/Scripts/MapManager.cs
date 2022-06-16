@@ -83,14 +83,15 @@ public class MapManager : MonoBehaviour
         player.tank.setMapManager(this);
 
         //If there are no global scenes 
-        if (_addToDefaultScene)
-            _networkManager.SceneManager.AddOwnerToDefaultScene(newTank);
+        // if (false && _addToDefaultScene)
+        //    _networkManager.SceneManager.AddOwnerToDefaultScene(newTank);
     }
 
     private void Awake()
     {
         _players = new Dictionary<NetworkConnection, Player>();
     }
+
     private Transform furthestPoint(Player targetPlayer)
     {
         float maxDistance = -1;
@@ -128,12 +129,14 @@ public class MapManager : MonoBehaviour
         return bestLocation;
     }
 
+    [Server]
     public void DespawnTank(Tank tank)
     {
         tank.Despawn();
-        Destroy(tank.gameObject);
+        // Destroy(tank.gameObject);
     }
 
+    [Server]
     public void Respawn(Tank tank)
     {
         DespawnTank(tank);

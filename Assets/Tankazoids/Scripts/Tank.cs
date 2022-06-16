@@ -80,7 +80,7 @@ public class Tank : NetworkBehaviour
         }
     }
 
-    #region Startup
+    #region Lifecycle
     private void Awake()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
@@ -91,16 +91,14 @@ public class Tank : NetworkBehaviour
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
-
-        InstanceFinder.TimeManager.OnTick += OnTick;
-        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
     }
 
     public override void OnStartNetwork()
     {
         base.OnStartNetwork();
-        
-        // InstanceFinder.TimeManager.OnTick += OnTick;
+
+        InstanceFinder.TimeManager.OnTick += OnTick;
+        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
     }
 
     private void OnDestroy()
@@ -127,7 +125,7 @@ public class Tank : NetworkBehaviour
 
         _health = GetMaxHealth();
     }
-    #endregion Startup
+    #endregion Lifecycle
 
     #region Control
     private InputData GetInputData()
@@ -179,9 +177,13 @@ public class Tank : NetworkBehaviour
 
         if (base.IsOwner)
         {
-            NonReplicatedInput(inputData);
+            if (inputData.weapon0Pressed)
+            {
+                NonReplicatedInput(inputData);
+            }
         }
 
+        Debug.Log(base.ObjectId.ToString() + ", " + base.IsOwner);
         HandleRollback(inputData);
     }
 
@@ -219,10 +221,7 @@ public class Tank : NetworkBehaviour
     [ServerRpc]
     private void NonReplicatedInput(InputData inputData)
     {
-        if (inputData.weapon0Pressed)
-        {
-            _weapon0Component.ActivateAbility(inputData);
-        }
+        _weapon0Component.ActivateAbility(inputData);
     }
     #endregion Control
 
