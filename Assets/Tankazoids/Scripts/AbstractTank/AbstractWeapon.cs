@@ -35,7 +35,7 @@ public abstract class AbstractWeapon : AbstractPart
 
         // herm... the velocity of the rigidbody gets synced
         Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
-        rb.velocity = target2D * _shotSpeed + _tank.rigidbody2d.velocity;
+        rb.velocity = target2D * _shotSpeed;
 
         PrepareProjectile(proj, target2D);
     }

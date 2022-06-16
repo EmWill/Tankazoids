@@ -15,7 +15,7 @@ public class Projectile : NetworkBehaviour
     {
         if (collision.gameObject.TryGetComponent(out Tank tank))
         {
-            if (!tank.Equals(Shooter))
+            if (tank.OwnerId != Shooter.OwnerId)
             {
                 // what if the shooter dies... :C
                 float dmg = Shooter.damageModifiers.CalculateStat(BaseDamage);

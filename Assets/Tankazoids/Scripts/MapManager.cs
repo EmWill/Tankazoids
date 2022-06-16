@@ -132,6 +132,7 @@ public class MapManager : MonoBehaviour
     [Server]
     public void DespawnTank(Tank tank)
     {
+        tank.name = "despawned tank";
         tank.Despawn();
         // Destroy(tank.gameObject);
     }

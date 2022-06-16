@@ -156,6 +156,8 @@ public class Tank : NetworkBehaviour
 
     private void OnTick()
     {
+        if (base.IsDeinitializing) return;
+
         InputData inputData = GetInputData();
         _weapon0Component.OnTankTick(inputData);
         // _weapon1Component.OnTankTick(inputData);
@@ -179,16 +181,19 @@ public class Tank : NetworkBehaviour
         {
             if (inputData.weapon0Pressed)
             {
+                Debug.Log("Sending!");
                 NonReplicatedInput(inputData);
             }
         }
 
-        Debug.Log(base.ObjectId.ToString() + ", " + base.IsOwner);
+        // Debug.Log(base.ObjectId.ToString() + ", " + base.IsOwner);
         HandleRollback(inputData);
     }
 
     private void OnPostTick()
     {
+        if (base.IsDeinitializing) return;
+
         // we could save on this allocation if we wanted to make the interface less nice... maybe we do
         Writer weapon0Writer = new();
         Writer weapon1Writer = new();
