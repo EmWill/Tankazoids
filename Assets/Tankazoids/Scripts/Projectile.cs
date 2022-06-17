@@ -1,3 +1,4 @@
+using FishNet;
 using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,11 +9,28 @@ public class Projectile : NetworkBehaviour
     public Tank Shooter;
     public float BaseDamage;
 
+    public Vector2 velocity;
+
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        InstanceFinder.TimeManager.OnTick += OnTick;
+    }
+
+    public override void OnStopNetwork()
+    {
+        base.OnStopNetwork();
+        InstanceFinder.TimeManager.OnTick -= OnTick;
+    }
+
+    public void OnTick()
+    {
+        transform.position += new Vector3(velocity.x, velocity.y, 0);
+    }
+
     public override void OnStartServer()
     {
         base.OnStartServer();
-
-        GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

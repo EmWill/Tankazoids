@@ -28,19 +28,24 @@ public abstract class AbstractWeapon : AbstractPart
 
     protected virtual void Ability(PreciseTick tick, Tank.InputData inputData, Tank tank)
     {
-        base.RollbackManager.Rollback(tick, RollbackManager.PhysicsType.ThreeDimensional, base.IsOwner);
+        base.RollbackManager.Rollback(tick, RollbackManager.PhysicsType.TwoDimensional, base.IsOwner);
 
-        Vector3 target = inputData.worldTargetPos - tank.transform.position;
+        var hitbox = tank.transform.GetChild(0);
+
+        Vector3 target = inputData.worldTargetPos - hitbox.position;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
-        GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
+        GameObject proj = Instantiate(projectile, hitbox.position, Quaternion.FromToRotation(hitbox.position, inputData.worldTargetPos));
         Spawn(proj, base.Owner);
         Destroy(proj, _timeToLive);
 
-        // herm... the velocity of the rigidbody gets synced
-        Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
-        rb.velocity = target2D * _shotSpeed;
+        proj.GetComponent<Projectile>().velocity = target2D * _shotSpeed;
 
         PrepareProjectile(proj);
+
+        for (uint i = tick.Tick; i < base.RollbackManager.PreciseTick.Tick; i++)
+        {
+            proj.GetComponent<Projectile>().OnTick();
+        }
 
         base.RollbackManager.Return();
     }

@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8722716170557939542}
   - component: {fileID: 1918144889854905933}
   - component: {fileID: -5822064554836150010}
-  - component: {fileID: 7891022370976458025}
   m_Layer: 6
   m_Name: DebugProjectile
   m_TagString: Untagged
@@ -63,7 +62,7 @@ MonoBehaviour:
   _enableTeleport: 0
   _teleportThreshold: 1
   _clientAuthoritative: 0
-  _sendToOwner: 1
+  _sendToOwner: 0
   _interval: 1
   _synchronizePosition: 1
   _positionSnapping:
@@ -95,7 +94,7 @@ MonoBehaviour:
   _networkBehaviours:
   - {fileID: -7715518736866777392}
   - {fileID: 1918144889854905933}
-  - {fileID: 7891022370976458025}
+  - {fileID: 0}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -145,6 +144,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2615850986456712606}
   Shooter: {fileID: 0}
   BaseDamage: 50
+  velocity: {x: 0, y: 0}
 --- !u!58 &-5822064554836150010
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -152,7 +152,7 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7598151544206760318}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -161,22 +161,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.2
---- !u!114 &7891022370976458025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7598151544206760318}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01a271dd97d875347b0cea860df29a9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 2
-  _addedNetworkObject: {fileID: 2615850986456712606}
-  _networkObjectCache: {fileID: 2615850986456712606}
-  _colliderParents: []
 --- !u!1 &9076445479882123054
 GameObject:
   m_ObjectHideFlags: 0
