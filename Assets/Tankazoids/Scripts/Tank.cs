@@ -1,4 +1,5 @@
 using FishNet;
+using FishNet.Component.ColliderRollback;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
@@ -189,7 +190,7 @@ public class Tank : NetworkBehaviour
             if (inputData.weapon0Pressed)
             {
                 Debug.Log("Sending!");
-                NonReplicatedInput(inputData);
+                NonReplicatedInput(base.RollbackManager.PreciseTick, inputData);
             }
         }
 
@@ -231,9 +232,9 @@ public class Tank : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void NonReplicatedInput(InputData inputData)
+    private void NonReplicatedInput(PreciseTick tick, InputData inputData)
     {
-        _weapon0Component.ActivateAbility(inputData);
+        _weapon0Component.ActivateAbility(tick, inputData);
     }
     #endregion Control
 

@@ -1,3 +1,4 @@
+using FishNet.Component.ColliderRollback;
 using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,19 +15,21 @@ public abstract class AbstractWeapon : AbstractPart
     protected float _timeToLive;
     protected float _baseDamage;
 
-    public override void ActivateAbility(Tank.InputData inputData)
+    public override void ActivateAbility(PreciseTick tick, Tank.InputData inputData)
     {
-        base.ActivateAbility(inputData);
+        base.ActivateAbility(tick, inputData);
 
         if (true && Time.time >= CanUseAt)
         {
-            Ability(inputData, _tank);
+            Ability(tick, inputData, _tank);
             CanUseAt = Time.time + (_tank.cooldownModifiers.CalculateStat(_baseCooldown));
         }
     }
 
-    protected virtual void Ability(Tank.InputData inputData, Tank tank)
+    protected virtual void Ability(PreciseTick tick, Tank.InputData inputData, Tank tank)
     {
+        base.RollbackManager.Rollback(tick, RollbackManager.PhysicsType.ThreeDimensional, base.IsOwner);
+
         Vector3 target = inputData.worldTargetPos - tank.transform.position;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
         GameObject proj = Instantiate(projectile, tank.transform.position, Quaternion.FromToRotation(tank.transform.position, inputData.worldTargetPos));
@@ -38,6 +41,8 @@ public abstract class AbstractWeapon : AbstractPart
         rb.velocity = target2D * _shotSpeed;
 
         PrepareProjectile(proj);
+
+        base.RollbackManager.Return();
     }
 
     // we may want to bufferlast here herm... thinking

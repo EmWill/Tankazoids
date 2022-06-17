@@ -6,6 +6,7 @@
 
 
 using FishNet.Connection;
+using FishNet.Documenting;
 using FishNet.Object;
 using FishNet.Serializing;
 using FishNet.Transporting;
@@ -80,7 +81,7 @@ namespace FishNet.Component.Transforming
             Z4 = 32,
             Nested = 64
         }
-        private class GoalData
+        public class GoalData
         {
             public uint ReceivedTick;
             public RateData Rates = new RateData();
@@ -94,7 +95,7 @@ namespace FishNet.Component.Transforming
                 Rates.Reset();
             }
         }
-        private class RateData
+        public class RateData
         {
             public float Position;
             public float Rotation;
@@ -134,7 +135,7 @@ namespace FishNet.Component.Transforming
             }
         }
 
-        private class TransformData
+        public class TransformData
         {
             public enum ExtrapolateState : byte
             {
@@ -152,7 +153,7 @@ namespace FishNet.Component.Transforming
             public NetworkBehaviour ParentBehaviour;
             public TransformData() { }
 
-            public void Reset()
+            internal void Reset()
             {
                 Tick = 0;
                 Snapped = false;
@@ -163,11 +164,11 @@ namespace FishNet.Component.Transforming
                 ExtrapolationState = ExtrapolateState.Disabled;
                 ParentBehaviour = null;
             }
-            public void Update(TransformData copy)
+            internal void Update(TransformData copy)
             {
                 Update(copy.Tick, copy.Position, copy.Rotation, copy.Scale, copy.ExtrapolatedPosition, copy.ParentBehaviour);
             }
-            public void Update(uint tick, Vector3 position, Quaternion rotation, Vector3 scale, Vector3 extrapolatedPosition, NetworkBehaviour parentBehaviour)
+            internal void Update(uint tick, Vector3 position, Quaternion rotation, Vector3 scale, Vector3 extrapolatedPosition, NetworkBehaviour parentBehaviour)
             {
                 Tick = tick;
                 Position = position;
@@ -180,6 +181,28 @@ namespace FishNet.Component.Transforming
 
         #endregion
 
+        #region Public.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="prev"></param>
+        /// <param name="next"></param>
+        [APIExclude]
+        public delegate void DataReceivedChanged(TransformData prev, TransformData next);
+        /// <summary>
+        /// Called when new data is received. Previous and next data are provided. Next data may be manipulated.
+        /// This feature is experimental.
+        /// </summary>
+        public event DataReceivedChanged OnDataReceived;
+        /// <summary>
+        /// Called when GoalData is updated.
+        /// </summary>
+        public event Action<GoalData> OnNextGoal;
+        /// <summary>
+        /// Called when the transform has reached it's goal.
+        /// </summary>
+        public event Action OnInterpolationComplete;
+        #endregion
         #region Serialized.
         /// <summary>
         /// True to synchronize when this transform changes parent.
@@ -415,7 +438,24 @@ namespace FishNet.Component.Transforming
                 }
             }
 
-            
+            //PROSTART
+            if (_synchronizeParent)
+            {
+                /* Can send under the following conditions.
+                 *  Client auth and not owner. No need to send parent changes to owner when client auth.
+                 *  
+                 *  Not client auth and send to owner. Everyone will get changes in this scenario.
+                 * 
+                 *  Not client auth, not send to owner, and not owner.
+                 *      This should send to everyone but owner.
+                 */
+                bool canSend = (_clientAuthoritative && connection != base.Owner) ||
+                    (!_clientAuthoritative && _sendToOwner) ||
+                    (!_clientAuthoritative && !_sendToOwner && connection != Owner);
+                if (canSend)
+                    TargetSetParent(connection, _parentBehaviour);
+            }
+            //PROEND
         }
 
         public override void OnStartClient()
@@ -498,7 +538,9 @@ namespace FishNet.Component.Transforming
                 _intervalsRemaining = _interval;
             }
 
-            
+            //PROSTART
+            UpdateParentBehaviour();
+            //PROEND
             if (base.IsServer)
                 SendToClients();
             if (base.IsClient)
@@ -854,7 +896,65 @@ namespace FishNet.Component.Transforming
             }
         }
 
-        
+        //PROSTART
+        /// <summary>
+        /// Updates the ParentBehaviour field when able to.
+        /// </summary>
+        private void UpdateParentBehaviour()
+        {
+            if (!_synchronizeParent)
+                return;
+            /* The field ParentBehaviour is only used by
+             * the sending connection. When moving the ParentBehaviour
+             * is deserialized into the TransformData, meaning the field
+             * varient is never used on connections which do not control
+             * the object. It's probably very similar in performance,
+             * possibly even more efficient to just run the parent change
+             * checks versus checking if those checks can be checked in the
+             * first place. check. */
+
+            Transform parent = transform.parent;
+            //No parent.
+            if (parent == null)
+            {
+                _parentBehaviour = null;
+                _parentTransform = null;
+            }
+            //Has a parent, see if eligible.
+            else
+            {
+                //No change.
+                if (_parentTransform == parent)
+                    return;
+
+                _parentTransform = parent;
+                parent.TryGetComponent<NetworkBehaviour>(out _parentBehaviour);
+                if (_parentBehaviour == null)
+                    LogInvalidParent();
+            }
+        }
+
+        /// <summary>
+        /// Sets the transforms parent if it's changed.
+        /// </summary>
+        /// <param name="parent"></param>
+        private void SetParent(NetworkBehaviour parent, RateData rd)
+        {
+            Transform target = (parent == null) ? null : parent.transform;
+            //Unchanged.
+            if (target == transform.parent)
+                return;
+
+            Vector3 scale = transform.localScale;
+            transform.SetParent(target);
+            transform.localScale = scale;
+
+            /* Set ratedata to immediate so there's no blending between transform values when
+             * getting on or off platforms. */
+            if (rd != null)
+                rd.Update(-1f, -1f, -1f, rd.LastUnalteredPositionRate, rd.AbnormalRateDetected, rd.TimeRemaining);
+        }
+        //PROEND
 
         /// <summary>
         /// Moves to a GoalData. Automatically determins if to use data from server or client.
@@ -887,7 +987,11 @@ namespace FishNet.Component.Transforming
             TransformData td = _currentGoalData.Transforms;
             RateData rd = _currentGoalData.Rates;
 
-            
+            //PROSTART
+            //Set parent.
+            if (_synchronizeParent)
+                SetParent(td.ParentBehaviour, rd);
+            //PROEND
 
             float multiplier = 1f;
             int queueCount = _goalDataQueue.Count;
@@ -946,14 +1050,34 @@ namespace FishNet.Component.Transforming
                 {
                     _currentGoalData.Reset();
                     _goalDataCache.Push(_currentGoalData);
-                    _currentGoalData = _goalDataQueue.Dequeue();
+                    SetCurrentGoalData(_goalDataQueue.Dequeue());
                     if (leftOver > 0f)
                         MoveToTarget(leftOver);
                 }
                 //No more in buffer, see if can extrapolate.
                 else
                 {
-                    
+                    //PROSTART
+                    //Can extrapolate.
+                    if (td.ExtrapolationState == TransformData.ExtrapolateState.Available)
+                    {
+                        rd.TimeRemaining = (float)(_extrapolation * base.TimeManager.TickDelta);
+                        td.ExtrapolationState = TransformData.ExtrapolateState.Active;
+                        if (leftOver > 0f)
+                            MoveToTarget(leftOver);
+                    }
+                    //Ran out of extrapolate.
+                    else if (td.ExtrapolationState == TransformData.ExtrapolateState.Active)
+                    {
+                        rd.TimeRemaining = (float)(_extrapolation * base.TimeManager.TickDelta);
+                        td.ExtrapolationState = TransformData.ExtrapolateState.Disabled;
+                        if (leftOver > 0f)
+                            MoveToTarget(leftOver);
+                    }
+                    //Extrapolation has ended or was never enabled.
+                    else
+                    {
+                        //PROEND
                         /* If everything matches up then end queue.
                         * Otherwise let it play out until stuff
                         * aligns. Generally the time remaining is enough
@@ -961,7 +1085,10 @@ namespace FishNet.Component.Transforming
                         * and it's thrown off. */
                         if (!HasChanged(td))
                             _queueReady = false;
-                        
+                        //PROSTART
+                        OnInterpolationComplete?.Invoke();
+                    }
+                    //PROEND
                 }
             }
 
@@ -1255,7 +1382,7 @@ namespace FishNet.Component.Transforming
                 lastTick = (nextGd.Transforms.Tick - _interval);
 
             uint tickDifference = (td.Tick - lastTick);
-            float timePassed = base.NetworkManager.TimeManager.TicksToTime(tickDifference);
+            float timePassed = (float)base.NetworkManager.TimeManager.TicksToTime(tickDifference);
 
             //Distance between properties.
             float distance;
@@ -1377,7 +1504,14 @@ namespace FishNet.Component.Transforming
             //Default value.
             next.ExtrapolationState = TransformData.ExtrapolateState.Disabled;
 
-            
+            //PROSTART
+            if (_extrapolation == 0 || !_synchronizePosition || channel == Channel.Reliable || next.Position == prev.Position)
+                return;
+
+            Vector3 offet = (next.Position - prev.Position) * _extrapolation;
+            next.ExtrapolatedPosition = (next.Position + offet);
+            next.ExtrapolationState = TransformData.ExtrapolateState.Available;
+            //PROEND
         }
 
 
@@ -1451,6 +1585,7 @@ namespace FishNet.Component.Transforming
             GoalData nextGd = GetCachedGoalData();
             TransformData nextTd = nextGd.Transforms;
             UpdateTransformData(data, prevTd, nextTd, ref changedFull);
+            OnDataReceived?.Invoke(prevTd, nextTd);
             SetExtrapolation(prevTd, nextTd, channel);
 
             bool hasChanged = HasChanged(prevTd, nextTd);
@@ -1485,7 +1620,7 @@ namespace FishNet.Component.Transforming
             if (_currentGoalData.Transforms.ExtrapolationState == TransformData.ExtrapolateState.Active)
             {
                 _queueReady = true;
-                _currentGoalData = nextGd;
+                SetCurrentGoalData(nextGd);
             }
             /* If queue isn't started and its buffered enough
              * to satisfy interpolation then set ready
@@ -1498,7 +1633,7 @@ namespace FishNet.Component.Transforming
                 _queueReady = true;
                 if (_goalDataQueue.Count > 0)
                 {
-                    _currentGoalData = _goalDataQueue.Dequeue();
+                    SetCurrentGoalData(_goalDataQueue.Dequeue());
                     /* If is reliable and has changed then also
                     * enqueue latest. */
                     if (hasChanged)
@@ -1506,7 +1641,9 @@ namespace FishNet.Component.Transforming
 
                 }
                 else
-                    _currentGoalData = nextGd;
+                {
+                    SetCurrentGoalData(nextGd);
+                }
             }
             /* If here then there's not enough in buffer to begin
              * so add onto the buffer. */
@@ -1517,12 +1654,46 @@ namespace FishNet.Component.Transforming
         }
 
         /// <summary>
+        /// Sets CurrentGoalData value.
+        /// </summary>
+        /// <param name="data"></param>
+        private void SetCurrentGoalData(GoalData data)
+        {
+            _currentGoalData = data;
+            OnNextGoal?.Invoke(data);
+        }
+
+        /// <summary>
         /// Immediately sets the parent of this NetworkTransform for a single connection.
         /// </summary>
         [TargetRpc]
         private void TargetSetParent(NetworkConnection conn, NetworkBehaviour parent)
         {
-            
+            //PROSTART
+            /* Same checks on sending end, just making sure
+             * something hasn't changed since packet was sent. */
+            if (!_synchronizeParent)
+                return;
+
+            /* Can be received if
+             *  Client auth and not owner. 
+             * 
+             *  Server auth and send to owner, since all clients should get this.
+             *  
+             *  Server auth, dont send to owner, and not owner.
+             */
+            bool canReceive = (_clientAuthoritative && !base.IsOwner) ||
+                (!_clientAuthoritative && _sendToOwner) ||
+                (!_clientAuthoritative && !_sendToOwner && !base.IsOwner);
+
+            if (!canReceive)
+                return;
+
+            _parentBehaviour = parent;
+            _lastReceivedTransformData.ParentBehaviour = parent;
+
+            SetParent(parent, null);
+            //PROEND
         }
 
         /// <summary>
@@ -1553,6 +1724,78 @@ namespace FishNet.Component.Transforming
         {
             _clientAuthoritative = false;
             _sendToOwner = false;
+        }
+
+        /// <summary>
+        /// Updates which properties are synchronized. This feature is experimental.
+        /// </summary>
+        /// <param name="value">Properties to synchronize.</param>
+        public void SetSynchronizedProperties(SynchronizedProperty value)
+        {
+            /* Make sure permissions are proper to change values.
+             * Let the server override client auth. 
+             *
+             * Can send if server.
+             * Or owner + client auth.
+             */
+            bool canSend = (
+                base.IsServer ||
+                (_clientAuthoritative && base.IsOwner)
+                );
+
+            if (!canSend)
+                return;
+
+            //If server send out observerRpc.
+            if (base.IsServer)
+                ObserversSetSynchronizedProperties(value);
+            //Otherwise send to the server.
+            else
+                ServerSetSynchronizedProperties(value);
+        }
+
+        /// <summary>
+        /// Sets synchronized values based on value.
+        /// </summary>
+        [ServerRpc]
+        private void ServerSetSynchronizedProperties(SynchronizedProperty value)
+        {
+            /* Client is trying to be sneaky ...
+             * a client should not be able to call this when NT isnt client auth. */
+            if (!_clientAuthoritative)
+                return;
+
+            SetSynchronizedPropertiesInternal(value);
+            ObserversSetSynchronizedProperties(value);
+        }
+
+        /// <summary>
+        /// Sets synchronized values based on value.
+        /// </summary>
+        [ObserversRpc(BufferLast = true)]
+        private void ObserversSetSynchronizedProperties(SynchronizedProperty value)
+        {
+            //Would have already run on server if host.
+            if (base.IsServer)
+                return;
+
+            SetSynchronizedPropertiesInternal(value);
+        }
+
+        /// <summary>
+        /// Sets synchronized values based on value.
+        /// </summary>
+        private void SetSynchronizedPropertiesInternal(SynchronizedProperty value)
+        {
+            _synchronizeParent = SynchronizedPropertyContains(value, SynchronizedProperty.Parent);
+            _synchronizePosition = SynchronizedPropertyContains(value, SynchronizedProperty.Position);
+            _synchronizeRotation = SynchronizedPropertyContains(value, SynchronizedProperty.Rotation);
+            _synchronizeScale = SynchronizedPropertyContains(value, SynchronizedProperty.Scale);
+
+            bool SynchronizedPropertyContains(SynchronizedProperty whole, SynchronizedProperty part)
+            {
+                return (whole & part) == part;
+            }
         }
     }
 
