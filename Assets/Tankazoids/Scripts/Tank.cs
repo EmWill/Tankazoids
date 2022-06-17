@@ -102,6 +102,8 @@ public class Tank : NetworkBehaviour
 
         InstanceFinder.TimeManager.OnTick += OnTick;
         InstanceFinder.TimeManager.OnPostTick += OnPostTick;
+
+        oldPositions = new Dictionary<uint, Vector3>();
     }
 
     private void OnDestroy()
@@ -121,8 +123,6 @@ public class Tank : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-
-        oldPositions = new Dictionary<uint, Vector3>();
 
         EquipWeapon0(defaultWeapon0Prefab);
         EquipBody(defaultBodyPrefab);
@@ -167,14 +167,11 @@ public class Tank : NetworkBehaviour
 
         if (base.IsDeinitializing) return;
 
-        if (base.IsServer)
-        {
-            oldPositions.Add(base.TimeManager.Tick, transform.position);
+        oldPositions.Add(base.TimeManager.Tick, transform.position);
 
-            if (oldPositions.Count > 30)
-            {
-                oldPositions.Remove(base.TimeManager.Tick - 29);
-            }
+        if (oldPositions.Count > 30)
+        {
+            oldPositions.Remove(base.TimeManager.Tick - 29);
         }
 
         InputData inputData = GetInputData();
