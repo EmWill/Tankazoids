@@ -167,11 +167,14 @@ public class Tank : NetworkBehaviour
 
         if (base.IsDeinitializing) return;
 
-        oldPositions.Add(base.TimeManager.Tick, transform.position);
-
-        if (oldPositions.Count > 30)
+        if (base.IsServer)
         {
-            oldPositions.Remove(base.TimeManager.Tick - 29);
+            oldPositions.Add(base.TimeManager.Tick, transform.position);
+
+            if (oldPositions.Count > 30)
+            {
+                oldPositions.Remove(base.TimeManager.Tick - 29);
+            }
         }
 
         InputData inputData = GetInputData();
@@ -244,7 +247,7 @@ public class Tank : NetworkBehaviour
         Reconcile(reconcileData, true);
     }
 
-    [ServerRpc]
+    [ServerRpc(RunLocally = true)]
     private void NonReplicatedInput(uint tick, InputData inputData)
     {
         _weapon0Component.ActivateAbility(tick, inputData);

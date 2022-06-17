@@ -31,7 +31,10 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - tank.oldPositions[tick];
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
         GameObject proj = Instantiate(projectile, tank.oldPositions[tick], Quaternion.FromToRotation(tank.oldPositions[tick], inputData.worldTargetPos));
-        Spawn(proj, base.Owner);
+
+        if (base.IsServer)
+            Spawn(proj, base.Owner);
+
         Destroy(proj, _timeToLive);
 
         proj.GetComponent<Projectile>().velocity = target2D * _shotSpeed;
