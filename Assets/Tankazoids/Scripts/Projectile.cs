@@ -11,26 +11,21 @@ public class Projectile : NetworkBehaviour
 
     public Vector2 velocity;
 
-    public override void OnStartNetwork()
+    public override void OnStartServer()
     {
-        base.OnStartNetwork();
+        base.OnStartServer();
         InstanceFinder.TimeManager.OnTick += OnTick;
     }
 
-    public override void OnStopNetwork()
+    public override void OnStopServer()
     {
-        base.OnStopNetwork();
+        base.OnStopServer();
         InstanceFinder.TimeManager.OnTick -= OnTick;
     }
 
     public void OnTick()
     {
         transform.position += new Vector3(velocity.x, velocity.y, 0);
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
