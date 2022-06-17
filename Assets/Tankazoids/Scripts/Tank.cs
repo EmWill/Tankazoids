@@ -53,6 +53,8 @@ public class Tank : NetworkBehaviour
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
+    public Dictionary<uint, Vector3> oldPositions;
+
     public Rigidbody2D rigidbody2d { get; private set; }
 
     public struct InputData
@@ -120,6 +122,8 @@ public class Tank : NetworkBehaviour
     {
         base.OnStartServer();
 
+        oldPositions = new Dictionary<uint, Vector3>();
+
         EquipWeapon0(defaultWeapon0Prefab);
         EquipBody(defaultBodyPrefab);
         EquipTread(defaultTreadPrefab);
@@ -159,7 +163,16 @@ public class Tank : NetworkBehaviour
 
     private void OnTick()
     {
+        Debug.Log(base.RollbackManager.PreciseTick.Tick);
+
         if (base.IsDeinitializing) return;
+
+        oldPositions.Add(base.TimeManager.Tick, transform.position);
+
+        if (oldPositions.Count > 30)
+        {
+            oldPositions.Remove(base.TimeManager.Tick - 29);
+        }
 
         InputData inputData = GetInputData();
         _weapon0Component.OnTankTick(inputData);
@@ -190,7 +203,7 @@ public class Tank : NetworkBehaviour
             if (inputData.weapon0Pressed)
             {
                 Debug.Log("Sending!");
-                NonReplicatedInput(base.RollbackManager.PreciseTick, inputData);
+                NonReplicatedInput(base.TimeManager.Tick, inputData);
             }
         }
 
@@ -232,7 +245,7 @@ public class Tank : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void NonReplicatedInput(PreciseTick tick, InputData inputData)
+    private void NonReplicatedInput(uint tick, InputData inputData)
     {
         _weapon0Component.ActivateAbility(tick, inputData);
     }

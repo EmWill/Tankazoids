@@ -12,7 +12,7 @@ public abstract class AbstractPart : NetworkBehaviour
 
     protected float _baseCooldown;
     public float CanUseAt { get; protected set; }
-    public virtual void ActivateAbility(PreciseTick tick, Tank.InputData inputData) { }
+    public virtual void ActivateAbility(uint tick, Tank.InputData inputData) { }
 
     public virtual void OnEquip(Tank tank)
     {

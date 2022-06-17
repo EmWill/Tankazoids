@@ -15,7 +15,7 @@ public abstract class AbstractWeapon : AbstractPart
     protected float _timeToLive;
     protected float _baseDamage;
 
-    public override void ActivateAbility(PreciseTick tick, Tank.InputData inputData)
+    public override void ActivateAbility(uint tick, Tank.InputData inputData)
     {
         base.ActivateAbility(tick, inputData);
 
@@ -26,15 +26,11 @@ public abstract class AbstractWeapon : AbstractPart
         }
     }
 
-    protected virtual void Ability(PreciseTick tick, Tank.InputData inputData, Tank tank)
+    protected virtual void Ability(uint tick, Tank.InputData inputData, Tank tank)
     {
-        base.RollbackManager.Rollback(tick, RollbackManager.PhysicsType.TwoDimensional, base.IsOwner);
-
-        var hitbox = tank.transform.GetChild(0);
-
-        Vector3 target = inputData.worldTargetPos - hitbox.position;
+        Vector3 target = inputData.worldTargetPos - tank.oldPositions[tick];
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
-        GameObject proj = Instantiate(projectile, hitbox.position, Quaternion.FromToRotation(hitbox.position, inputData.worldTargetPos));
+        GameObject proj = Instantiate(projectile, tank.oldPositions[tick], Quaternion.FromToRotation(tank.oldPositions[tick], inputData.worldTargetPos));
         Spawn(proj, base.Owner);
         Destroy(proj, _timeToLive);
 
@@ -42,12 +38,10 @@ public abstract class AbstractWeapon : AbstractPart
 
         PrepareProjectile(proj);
 
-        for (uint i = tick.Tick; i < base.RollbackManager.PreciseTick.Tick; i++)
+        for (uint i = tick; i < base.TimeManager.Tick; i++)
         {
             proj.GetComponent<Projectile>().OnTick();
         }
-
-        base.RollbackManager.Return();
     }
 
     // we may want to bufferlast here herm... thinking
