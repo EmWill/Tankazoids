@@ -163,15 +163,16 @@ public class Tank : NetworkBehaviour
 
     private void OnTick()
     {
-        Debug.Log(base.RollbackManager.PreciseTick.Tick);
-
         if (base.IsDeinitializing) return;
 
-        oldPositions.Add(base.TimeManager.Tick, transform.position);
-
-        if (oldPositions.Count > 30)
+        if (base.IsServer)
         {
-            oldPositions.Remove(base.TimeManager.Tick - 29);
+            oldPositions.Add(base.TimeManager.Tick, transform.position);
+
+            if (oldPositions.Count > 30)
+            {
+                oldPositions.Remove(base.TimeManager.Tick - 30);
+            }
         }
 
         InputData inputData = GetInputData();

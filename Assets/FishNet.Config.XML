@@ -4,5 +4,5 @@
   <IsBuilding>false</IsBuilding>
   <IsDevelopment>false</IsDevelopment>
   <IsHeadless>false</IsHeadless>
-  <StripReleaseBuilds>false</StripReleaseBuilds>
+  <StripReleaseBuilds>true</StripReleaseBuilds>
 </ConfigurationData>

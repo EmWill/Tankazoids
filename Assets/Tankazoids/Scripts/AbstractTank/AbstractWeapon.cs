@@ -28,22 +28,32 @@ public abstract class AbstractWeapon : AbstractPart
 
     protected virtual void Ability(uint tick, Tank.InputData inputData, Tank tank)
     {
-        Vector3 target = inputData.worldTargetPos - tank.oldPositions[tick];
+        Vector3 tankPosition = (base.IsServer) ? tank.oldPositions[tick] : tank.transform.position;
+
+        Vector3 target = inputData.worldTargetPos - tankPosition;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
-        GameObject proj = Instantiate(projectile, tank.oldPositions[tick], Quaternion.FromToRotation(tank.oldPositions[tick], inputData.worldTargetPos));
+        GameObject proj = Instantiate(projectile, tankPosition, Quaternion.FromToRotation(tankPosition, inputData.worldTargetPos));
 
         if (base.IsServer)
+        {
             Spawn(proj, base.Owner);
-
-        Destroy(proj, _timeToLive);
+            Destroy(proj, _timeToLive);
+        } else
+        {
+            Destroy(proj, base.TimeManager.RoundTripTime/1000f);
+            proj.GetComponent<Projectile>().isRollbackDummy = true;
+        }
 
         proj.GetComponent<Projectile>().velocity = target2D * _shotSpeed;
 
-        PrepareProjectile(proj);
-
-        for (uint i = tick; i < base.TimeManager.Tick; i++)
+        if (base.IsServer)
         {
-            proj.GetComponent<Projectile>().OnTick();
+            PrepareProjectile(proj);
+
+            for (uint i = tick; i < base.TimeManager.Tick; i++)
+            {
+                proj.GetComponent<Projectile>().OnTick();
+            }
         }
     }
 

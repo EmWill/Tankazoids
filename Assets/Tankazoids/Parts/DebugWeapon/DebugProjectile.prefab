@@ -100,7 +100,7 @@ MonoBehaviour:
   _isNetworked: 1
   _hasParentNetworkObjectAtEdit: 0
   NetworkObserver: {fileID: 0}
-  _prefabId: 14
+  _prefabId: 10
   _scenePathHash: 0
   _sceneId: 0
   _sceneNetworkObjects: []
@@ -119,8 +119,9 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 2615850986456712606}
   _networkObjectCache: {fileID: 2615850986456712606}
+  isRollbackDummy: 0
   Shooter: {fileID: 0}
-  BaseDamage: 34
+  BaseDamage: 50
   velocity: {x: 0, y: 0}
 --- !u!58 &-5822064554836150010
 CircleCollider2D:
@@ -132,7 +133,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

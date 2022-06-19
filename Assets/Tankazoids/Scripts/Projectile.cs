@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Projectile : NetworkBehaviour
 {
+    public bool isRollbackDummy = false;
+
     public Tank Shooter;
     public float BaseDamage;
 
@@ -30,6 +32,8 @@ public class Projectile : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (isRollbackDummy) return;
+
         if (collision.gameObject.TryGetComponent(out Tank tank))
         {
             if (tank.OwnerId != Shooter.OwnerId)
