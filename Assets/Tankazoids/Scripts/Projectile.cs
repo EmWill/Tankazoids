@@ -13,15 +13,13 @@ public class Projectile : NetworkBehaviour
 
     public Vector2 velocity;
 
-    public override void OnStartServer()
+    public void Awake()
     {
-        base.OnStartServer();
         InstanceFinder.TimeManager.OnTick += OnTick;
     }
 
-    public override void OnStopServer()
+    public void OnDestroy()
     {
-        base.OnStopServer();
         InstanceFinder.TimeManager.OnTick -= OnTick;
     }
 

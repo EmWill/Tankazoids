@@ -1,4 +1,5 @@
 using FishNet.Component.ColliderRollback;
+using FishNet.Component.Transforming;
 using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +33,9 @@ public abstract class AbstractWeapon : AbstractPart
 
         Vector3 target = inputData.worldTargetPos - tankPosition;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
+
+        if (base.IsServer) return;
+
         GameObject proj = Instantiate(projectile, tankPosition, Quaternion.FromToRotation(tankPosition, inputData.worldTargetPos));
 
         if (base.IsServer)
@@ -42,6 +46,9 @@ public abstract class AbstractWeapon : AbstractPart
         {
             Destroy(proj, base.TimeManager.RoundTripTime/1000f);
             proj.GetComponent<Projectile>().isRollbackDummy = true;
+
+            proj.GetComponent<NetworkObject>().enabled = false;
+            proj.GetComponent<NetworkTransform>().enabled = false;
         }
 
         proj.GetComponent<Projectile>().velocity = target2D * _shotSpeed;
