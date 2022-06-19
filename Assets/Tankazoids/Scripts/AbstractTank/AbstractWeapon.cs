@@ -20,6 +20,8 @@ public abstract class AbstractWeapon : AbstractPart
     {
         base.ActivateAbility(tick, inputData);
 
+        Debug.Log(base.TimeManager.Tick - tick);
+
         if (true && Time.time >= CanUseAt)
         {
             Ability(tick, inputData, _tank);
@@ -55,7 +57,7 @@ public abstract class AbstractWeapon : AbstractPart
         {
             PrepareProjectile(proj);
 
-            for (uint i = tick; i < base.TimeManager.Tick; i++)
+            for (uint i = 0; i < (base.TimeManager.Tick - tick) * 2; i++)
             {
                 proj.GetComponent<Projectile>().OnTick();
             }
