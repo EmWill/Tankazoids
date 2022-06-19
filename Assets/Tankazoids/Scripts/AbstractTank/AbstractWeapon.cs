@@ -34,8 +34,6 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - tankPosition;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
 
-        if (base.IsServer) return;
-
         GameObject proj = Instantiate(projectile, tankPosition, Quaternion.FromToRotation(tankPosition, inputData.worldTargetPos));
 
         if (base.IsServer)
