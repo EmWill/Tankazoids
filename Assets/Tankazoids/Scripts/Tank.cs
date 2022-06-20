@@ -188,18 +188,6 @@ public class Tank : NetworkBehaviour
         _bodyComponent.OnTankTick(inputData);
         _treadsComponent.OnTankTick(inputData);
 
-        if (inputData.sprintPressed != _sprinting)
-        {
-            if (inputData.sprintPressed)
-            {
-                speedModifiers.AddMultiplier(2f);
-                _sprinting = true;
-            } else
-            {
-                speedModifiers.RemoveMultiplier(2f);
-                _sprinting = false;
-            }
-        }
 
         if (inputData.bodyPressed && TimeManager.LocalTick % 20 == 0)
         {
@@ -208,6 +196,7 @@ public class Tank : NetworkBehaviour
 
         if (base.IsOwner)
         {
+            Sprint(inputData.sprintPressed);
             if (inputData.swapPressed)
             {
                 //SwapWeapons();
@@ -224,6 +213,24 @@ public class Tank : NetworkBehaviour
 
         // Debug.Log(base.ObjectId.ToString() + ", " + base.IsOwner);
         HandleRollback(inputData);
+    }
+
+    [ServerRpc(RunLocally = true)]
+    private void Sprint(bool sprintPressed) {
+        if (sprintPressed != _sprinting)
+        {
+            print("hehahahadshfdahsdafhg");
+            if (sprintPressed)
+            {
+                speedModifiers.AddMultiplier(2f);
+                _sprinting = true;
+            }
+            else
+            {
+                speedModifiers.RemoveMultiplier(2f);
+                _sprinting = false;
+            }
+        }
     }
 
     private void OnPostTick()
@@ -299,8 +306,8 @@ public class Tank : NetworkBehaviour
 
 
         _weapon1Object = Instantiate(prefab, weaponContainer.transform);
-        InstanceFinder.ServerManager.Spawn(_weapon1Object.GetComponent<NetworkObject>(), base.Owner);
         _weapon1Object.transform.localScale = new Vector3(_weapon1Object.transform.localScale.x, _weapon1Object.transform.localScale.y, -_weapon1Object.transform.localScale.z);
+        InstanceFinder.ServerManager.Spawn(_weapon1Object.GetComponent<NetworkObject>(), base.Owner);
 
         _weapon1Component = _weapon1Object.GetComponent<AbstractWeapon>();
         _weapon1Component.OnEquip(this);
