@@ -205,8 +205,7 @@ public class Tank : NetworkBehaviour
         {
             if (inputData.weapon0Pressed)
             {
-                Debug.Log("Sending!");
-                NonReplicatedInput(base.TimeManager.Tick, inputData);
+                _weapon0Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
             }
         }
 
@@ -247,11 +246,6 @@ public class Tank : NetworkBehaviour
         Reconcile(reconcileData, true);
     }
 
-    [ServerRpc(RunLocally = true)]
-    private void NonReplicatedInput(uint tick, InputData inputData)
-    {
-        _weapon0Component.ActivateAbility(tick, inputData);
-    }
     #endregion Control
 
     #region Equipping

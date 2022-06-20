@@ -13,9 +13,12 @@ public class Projectile : NetworkBehaviour
 
     public Vector2 velocity;
 
+    private float _tickDelta;
+
     public void Awake()
     {
         InstanceFinder.TimeManager.OnTick += OnTick;
+        _tickDelta = (float)InstanceFinder.TimeManager.TickDelta;
     }
 
     public void OnDestroy()
@@ -23,9 +26,14 @@ public class Projectile : NetworkBehaviour
         InstanceFinder.TimeManager.OnTick -= OnTick;
     }
 
-    public void OnTick()
+    private void OnTick()
     {
-        transform.position += new Vector3(velocity.x, velocity.y, 0);
+        TickForTime(_tickDelta);
+    }
+
+    public void TickForTime(float time)
+    {
+        transform.position += new Vector3(velocity.x, velocity.y, 0) * time;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

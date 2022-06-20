@@ -13,7 +13,7 @@ public class DebugWeapon : AbstractWeapon
     private void Awake()
     {
         _timeToLive = 10f;
-        _shotSpeed = 0.1f;
+        _shotSpeed = 5f;
         _baseCooldown = .5f;
         projectile.GetComponent<Projectile>().BaseDamage = 50f;
     }
