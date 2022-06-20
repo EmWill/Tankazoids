@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class MapManager : MonoBehaviour
 {
-    public struct Player
+    public class Player
     {
         public NetworkConnection connection;
 
@@ -78,7 +78,6 @@ public class MapManager : MonoBehaviour
     {
         NetworkObject newTank = Instantiate(_tankPrefab, location.position, Quaternion.identity);
         _networkManager.ServerManager.Spawn(newTank, player.connection);
-
         player.tank = newTank.GetComponent<Tank>();
         player.tank.setMapManager(this);
 
