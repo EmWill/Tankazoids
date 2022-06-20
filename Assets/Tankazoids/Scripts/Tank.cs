@@ -45,10 +45,10 @@ public class Tank : NetworkBehaviour
     [SyncVar]
     private float _health;
 
+    // synced by replicate
     private bool _sprinting = false;
 
-    // not good for these to be public.. should be private set but idk if that is possible with syncvars
-    [SyncVar]
+    // this is synced manually
     private bool _overheated = false;
 
     private bool _dead = false;
@@ -175,6 +175,7 @@ public class Tank : NetworkBehaviour
         // not replicated!!
         if (base.IsOwner)
         {
+
             InputData inputData = GetInputData();
             _weapon0Component.OnTankTick(inputData);
             _weapon1Component.OnTankTick(inputData);
@@ -402,7 +403,9 @@ public class Tank : NetworkBehaviour
         public Vector3 rigidbodyVelocity;
         public float rigidbodyAngularVelocity;
 
-        public StatManager speedModifiers;
+        // todo this is kinda icky i should figure out why it wont auto serialize statmods
+        public float speedModifierMultiplier;
+        public float speedModifierBonus;
 
         public byte[] weapon0ReconcileData;
         public byte[] weapon1ReconcileData;
@@ -425,7 +428,8 @@ public class Tank : NetworkBehaviour
             this.rigidbodyVelocity = rigidbodyVelocity;
             this.rigidbodyAngularVelocity = rigidbodyAngularVelocity;
 
-            this.speedModifiers = speedModifiers;
+            this.speedModifierMultiplier = speedModifiers.Multiplier;
+            this.speedModifierBonus = speedModifiers.Bonus;
 
             this.weaponRotation = weaponRotation;
 
@@ -472,7 +476,7 @@ public class Tank : NetworkBehaviour
         rigidbody2d.velocity = reconcileData.rigidbodyVelocity;
         rigidbody2d.angularVelocity = reconcileData.rigidbodyAngularVelocity;
 
-        speedModifiers = reconcileData.speedModifiers;
+        speedModifiers = new StatManager(reconcileData.speedModifierBonus, speedModifiers.Multiplier);
 
         weaponContainer.transform.rotation = reconcileData.rotation;
 
@@ -575,7 +579,7 @@ public class Tank : NetworkBehaviour
 
         if (_heat > GetMaxHeat() && !_overheated)
         {
-            Overheat();
+            Overheat(base.Owner);
         }
     }
 
@@ -596,19 +600,20 @@ public class Tank : NetworkBehaviour
 
         if (_heat == 0 && _overheated)
         {
-            Unoverheat();
+            Unoverheat(base.Owner);
         }
     }
 
-    [Server]
-    private void Overheat()
+    // todo is this ok? theoretically the speedmods should get synced automatically I think ?
+    [TargetRpc(RunLocally = true)]
+    private void Overheat(NetworkConnection connection)
     {
         speedModifiers.AddMultiplier(0.25f);
         _overheated = true;
     }
 
-    [Server]
-    private void Unoverheat()
+    [TargetRpc(RunLocally = true)]
+    private void Unoverheat(NetworkConnection connection)
     {
         speedModifiers.RemoveMultiplier(0.25f);
         _overheated = false;

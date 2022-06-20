@@ -15,7 +15,7 @@ public class StatManager
         Bonus = 0f;
     }
 
-    public StatManager(int Bonus, float Multiplier)
+    public StatManager(float Bonus, float Multiplier)
     {
         this.Bonus = Bonus;
         this.Multiplier = Multiplier;
