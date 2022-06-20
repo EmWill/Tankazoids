@@ -5080,9 +5080,9 @@ MonoBehaviour:
   _transport: {fileID: 7443408886491487338}
   _showStatistics: 0
   _simulate: 1
-  _latency: 199
-  _packetloss: 0
-  _outOfOrder: 0
+  _latency: 200
+  _packetloss: 0.009999999776482582
+  _outOfOrder: 0.0010000000474974513
 --- !u!224 &9139860295689780510
 RectTransform:
   m_ObjectHideFlags: 0
