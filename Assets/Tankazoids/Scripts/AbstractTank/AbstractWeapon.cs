@@ -35,26 +35,28 @@ public abstract class AbstractWeapon : AbstractPart
 
         GameObject proj = Instantiate(projectile, clientTankPosition, Quaternion.FromToRotation(clientTankPosition, inputData.worldTargetPos));
 
-        if (base.IsServer)
-        {
-            Spawn(proj, base.Owner);
-            Destroy(proj, _timeToLive);
-        } else
-        {
-            // Destroy(proj, base.TimeManager.RoundTripTime / 1000f);
-            proj.GetComponent<Projectile>().isRollbackDummy = true;
+        Projectile projectileComponent = proj.GetComponent<Projectile>();
 
-            proj.GetComponent<NetworkObject>().enabled = false;
-            proj.GetComponent<NetworkTransform>().enabled = false;
-        }
-
-        proj.GetComponent<Projectile>().velocity = target2D * _shotSpeed;
+        projectileComponent.velocity = target2D * _shotSpeed;
 
         if (base.IsServer)
         {
             PrepareProjectile(proj);
 
-            proj.GetComponent<Projectile>().TickForTime(GetRollbackTime(tick));
+            projectileComponent.TickForTime(GetRollbackTime(tick));
+
+            Spawn(proj, base.Owner);
+            Destroy(proj, _timeToLive);
+
+            _tank.AddHeat(5f);
+        } else
+        {
+            Destroy(proj, base.TimeManager.RoundTripTime / 1000f);
+            projectileComponent.isRollbackDummy = true;
+
+            // this is local only!!
+            proj.GetComponent<NetworkObject>().enabled = false;
+            proj.GetComponent<NetworkTransform>().enabled = false;
         }
     }
 

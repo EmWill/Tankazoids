@@ -46,14 +46,17 @@ public class Tank : NetworkBehaviour
     private float _health;
 
     private bool _sprinting = false;
+
+    // not good for these to be public.. should be private set but idk if that is possible with syncvars
+    [SyncVar]
+    private bool _overheated = false;
+
     private bool _dead = false;
 
     private MapManager _mapManager;
 
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
-
-    public Dictionary<uint, Vector3> oldPositions;
 
     public Rigidbody2D rigidbody2d { get; private set; }
 
@@ -105,8 +108,6 @@ public class Tank : NetworkBehaviour
 
         InstanceFinder.TimeManager.OnTick += OnTick;
         InstanceFinder.TimeManager.OnPostTick += OnPostTick;
-
-        oldPositions = new Dictionary<uint, Vector3>();
     }
 
     private void OnDestroy()
@@ -166,40 +167,28 @@ public class Tank : NetworkBehaviour
             );
     }
 
+    // todo could be a good idea to formalize some of this stuff and make it easier to understand
     private void OnTick()
     {
-        // Debug.Log(base.TimeManager.Tick);
-
         if (base.IsDeinitializing) return;
 
-        if (base.IsServer)
-        {
-            oldPositions.Add(base.TimeManager.Tick, transform.position);
-
-            if (oldPositions.Count > 60)
-            {
-                oldPositions.Remove(base.TimeManager.Tick - 60);
-            }
-        }
-
-        InputData inputData = GetInputData();
-        _weapon0Component.OnTankTick(inputData);
-        _weapon1Component.OnTankTick(inputData);
-        _bodyComponent.OnTankTick(inputData);
-        _treadsComponent.OnTankTick(inputData);
-
-
-        if (inputData.bodyPressed && TimeManager.LocalTick % 20 == 0)
-        {
-            RemoveHealth(999);
-        }
-
+        // not replicated!!
         if (base.IsOwner)
         {
-            Sprint(inputData.sprintPressed);
+            InputData inputData = GetInputData();
+            _weapon0Component.OnTankTick(inputData);
+            _weapon1Component.OnTankTick(inputData);
+            _bodyComponent.OnTankTick(inputData);
+            _treadsComponent.OnTankTick(inputData);
+
+            if (inputData.bodyPressed && TimeManager.LocalTick % 20 == 0)
+            {
+                RemoveHealth(999);
+            }
+
             if (inputData.swapPressed)
             {
-                //SwapWeapons();
+                SwapWeapons();
             }
             if (inputData.weapon0Pressed)
             {
@@ -209,27 +198,18 @@ public class Tank : NetworkBehaviour
             {
                 _weapon1Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
             }
+
+            // handle rollback locally
+            Reconcile(default, false);
+            Replicate(inputData, false);
         }
 
-        // Debug.Log(base.ObjectId.ToString() + ", " + base.IsOwner);
-        HandleRollback(inputData);
-    }
-
-    [ServerRpc(RunLocally = true)]
-    private void Sprint(bool sprintPressed) {
-        if (sprintPressed != _sprinting)
+        if (base.IsServer)
         {
-            print("hehahahadshfdahsdafhg");
-            if (sprintPressed)
-            {
-                speedModifiers.AddMultiplier(2f);
-                _sprinting = true;
-            }
-            else
-            {
-                speedModifiers.RemoveMultiplier(2f);
-                _sprinting = false;
-            }
+            ProcessHeatOnTick();
+
+            // handle rollback on server
+            Replicate(default, true);
         }
     }
 
@@ -245,7 +225,7 @@ public class Tank : NetworkBehaviour
 
         // ask the components to write their data to the writers
         _weapon0Component.GetReconcileData(weapon0Writer);
-        // _weapon1Component.GetReconcileData(weapon1Writer);
+        _weapon1Component.GetReconcileData(weapon1Writer);
         _bodyComponent.GetReconcileData(bodyWriter);
         _treadsComponent.GetReconcileData(treadsWriter);
 
@@ -269,6 +249,7 @@ public class Tank : NetworkBehaviour
     #endregion Control
 
     #region Equipping
+    [ServerRpc]
     public void SwapWeapons()
     {
         print("we swapping no stopping");
@@ -455,23 +436,23 @@ public class Tank : NetworkBehaviour
         }
     }
 
-    private void HandleRollback(InputData inputData)
-    {
-        if (base.IsOwner)
-        {
-            Reconcile(default, false);
-            Replicate(inputData, false);
-        }
-
-        if (base.IsServer)
-        {
-            Replicate(default, true);
-        }
-    }
-
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
+        if (inputData.sprintPressed != _sprinting)
+        {
+            if (inputData.sprintPressed)
+            {
+                speedModifiers.AddMultiplier(1.5f);
+                _sprinting = true;
+            }
+            else
+            {
+                speedModifiers.RemoveMultiplier(1.5f);
+                _sprinting = false;
+            }
+        }
+
         _treadsComponent.DecayVelocity();
         _treadsComponent.DecayAngularVelocity();
 
@@ -564,6 +545,25 @@ public class Tank : NetworkBehaviour
     }
 
     [Server]
+    private void ProcessHeatOnTick()
+    {
+        if (_sprinting)
+        {
+            AddHeat(30 * (float)base.TimeManager.TickDelta);
+        }
+        else
+        {
+            if (!_overheated)
+            {
+                RemoveHeat(10 * (float)base.TimeManager.TickDelta);
+            } else
+            {
+                RemoveHeat(30 * (float)base.TimeManager.TickDelta);
+            }
+        }
+    }
+
+    [Server]
     public void AddHeat(float amount)
     {
         if (amount <= 0)
@@ -573,7 +573,7 @@ public class Tank : NetworkBehaviour
 
         _heat += amount;
 
-        if (_heat > GetMaxHeat())
+        if (_heat > GetMaxHeat() && !_overheated)
         {
             Overheat();
         }
@@ -582,18 +582,41 @@ public class Tank : NetworkBehaviour
     [Server]
     public void RemoveHeat(float amount)
     {
+        if (_heat == 0)
+        {
+            return;
+        }
+
         if (amount <= 0)
         {
             Debug.LogError("removed 0 or negative heat!?");
         }
 
         _heat = Math.Max(_heat - amount, 0);
+
+        if (_heat == 0 && _overheated)
+        {
+            Unoverheat();
+        }
     }
 
     [Server]
-    public void Overheat()
+    private void Overheat()
     {
-        Debug.Log("u just overheated!!");
+        speedModifiers.AddMultiplier(0.25f);
+        _overheated = true;
+    }
+
+    [Server]
+    private void Unoverheat()
+    {
+        speedModifiers.RemoveMultiplier(0.25f);
+        _overheated = false;
+    }
+
+    public bool IsOverheated()
+    {
+        return _overheated;
     }
     #endregion Heat
 
