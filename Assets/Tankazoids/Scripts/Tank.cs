@@ -68,8 +68,10 @@ public class Tank : NetworkBehaviour
         public bool bodyPressed;
         public bool treadPressed;
         public bool sprintPressed;
+        public bool swapPressed;
 
-        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed, bool bodyPressed, bool treadPressed, bool sprintPressed)
+        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed, 
+            bool bodyPressed, bool treadPressed, bool sprintPressed, bool swapPressed)
         {
             this.worldTargetPos = worldTargetPos;
 
@@ -80,6 +82,7 @@ public class Tank : NetworkBehaviour
             this.bodyPressed = bodyPressed;
             this.treadPressed = treadPressed;
             this.sprintPressed = sprintPressed;
+            this.swapPressed = swapPressed;
         }
     }
 
@@ -125,6 +128,7 @@ public class Tank : NetworkBehaviour
         base.OnStartServer();
 
         EquipWeapon0(defaultWeapon0Prefab);
+        EquipWeapon1(defaultWeapon1Prefab);
         EquipBody(defaultBodyPrefab);
         EquipTread(defaultTreadPrefab);
 
@@ -157,7 +161,8 @@ public class Tank : NetworkBehaviour
                 Input.GetButton("Weapon1"),
                 Input.GetButton("Body"),
                 Input.GetButton("Tread"),
-                Input.GetButton("Sprint")
+                Input.GetButton("Sprint"),
+                Input.GetButton("Swap")
             );
     }
 
@@ -179,7 +184,7 @@ public class Tank : NetworkBehaviour
 
         InputData inputData = GetInputData();
         _weapon0Component.OnTankTick(inputData);
-        // _weapon1Component.OnTankTick(inputData);
+        _weapon1Component.OnTankTick(inputData);
         _bodyComponent.OnTankTick(inputData);
         _treadsComponent.OnTankTick(inputData);
 
@@ -203,9 +208,17 @@ public class Tank : NetworkBehaviour
 
         if (base.IsOwner)
         {
+            if (inputData.swapPressed)
+            {
+                //SwapWeapons();
+            }
             if (inputData.weapon0Pressed)
             {
                 _weapon0Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
+            }
+            if (inputData.weapon1Pressed)
+            {
+                _weapon1Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
             }
         }
 
@@ -249,6 +262,13 @@ public class Tank : NetworkBehaviour
     #endregion Control
 
     #region Equipping
+    public void SwapWeapons()
+    {
+        print("we swapping no stopping");
+        GameObject leftHand = _weapon0Object;
+        EquipWeapon0(_weapon1Object);
+        EquipWeapon1(leftHand);
+    }
     // todo mkae this server_spawnweapon and put equip elsewhere?
     public void EquipWeapon0(GameObject prefab) {
         GameObject oldWeapon = _weapon0Object;
@@ -261,6 +281,30 @@ public class Tank : NetworkBehaviour
         _weapon0Component = _weapon0Object.GetComponent<AbstractWeapon>();
         _weapon0Component.OnEquip(this);
         UpdateClientWeapon0(base.Owner, _weapon0Object, _weapon0Component);
+
+
+        if (oldWeapon == null)
+        {
+            return;
+        }
+
+        oldWeaponComponent.Despawn();
+        Destroy(oldWeapon);
+    }
+
+    public void EquipWeapon1(GameObject prefab)
+    {
+        GameObject oldWeapon = _weapon1Object;
+        NetworkBehaviour oldWeaponComponent = _weapon1Component;
+
+
+        _weapon1Object = Instantiate(prefab, weaponContainer.transform);
+        InstanceFinder.ServerManager.Spawn(_weapon1Object.GetComponent<NetworkObject>(), base.Owner);
+        _weapon1Object.transform.localScale = new Vector3(_weapon1Object.transform.localScale.x, _weapon1Object.transform.localScale.y, -_weapon1Object.transform.localScale.z);
+
+        _weapon1Component = _weapon1Object.GetComponent<AbstractWeapon>();
+        _weapon1Component.OnEquip(this);
+        UpdateClientWeapon1(base.Owner, _weapon1Object, _weapon1Component);
 
 
         if (oldWeapon == null)
@@ -323,6 +367,17 @@ public class Tank : NetworkBehaviour
         _weapon0Component = weaponComponent;
 
         _weapon0Component.OnEquip(this);
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    public void UpdateClientWeapon1(NetworkConnection conn, GameObject weaponObject, AbstractWeapon weaponComponent)
+    {
+        weaponObject.transform.SetParent(weaponContainer.transform);
+
+        _weapon1Object = weaponObject;
+        _weapon1Component = weaponComponent;
+
+        _weapon1Component.OnEquip(this);
     }
 
     [ObserversRpc(BufferLast = true)]
@@ -434,7 +489,7 @@ public class Tank : NetworkBehaviour
         weaponContainer.transform.rotation = reconcileData.rotation;
 
         _weapon0Component.HandleReconcileData(new Reader(reconcileData.weapon0ReconcileData, base.NetworkManager));
-        // _weapon1Component.HandleReconcileData(new Reader(reconcileData.weapon1ReconcileData, base.NetworkManager));
+        _weapon1Component.HandleReconcileData(new Reader(reconcileData.weapon1ReconcileData, base.NetworkManager));
         _bodyComponent.HandleReconcileData(new Reader(reconcileData.bodyReconcileData, base.NetworkManager));
         _treadsComponent.HandleReconcileData(new Reader(reconcileData.treadsReconcileData, base.NetworkManager));
     }
