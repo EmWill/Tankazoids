@@ -94,10 +94,41 @@ public class MapManager : MonoBehaviour
     private Transform furthestPoint(Player targetPlayer)
     {
         float maxDistance = -1;
-        Transform bestLocation = _spawnPoints[0];
+        int randomSpawnIndex = Random.Range(0, _spawnPoints.Count);
+        Transform bestLocation = _spawnPoints[randomSpawnIndex];
 
-        foreach(Transform spawnPoint in _spawnPoints)
+
+        float initialMaxDistance = -1;
+        foreach (Player player in _players.Values)
         {
+            if (player.tank == null || player.Equals(targetPlayer))
+            {
+                continue;
+            }
+
+            if (initialMaxDistance < 0)
+            {
+                initialMaxDistance = (player.tank.transform.position - bestLocation.position).magnitude;
+            }
+            else
+            {
+                float newDistance = (player.tank.transform.position - bestLocation.position).magnitude;
+                if (newDistance > initialMaxDistance)
+                {
+                    initialMaxDistance = newDistance;
+                }
+            }
+        }
+        if (initialMaxDistance < 0) return bestLocation; // THERE'S NO PLAYERS ON THE MAP! GO RANDOM!
+            maxDistance = initialMaxDistance;
+
+        for (int i = 0; i < _spawnPoints.Count; i++)
+        {
+            if (i == randomSpawnIndex)
+            {
+                continue;
+            }
+            Transform spawnPoint = _spawnPoints[i];
             float currMaxDistance = -1;
             foreach (Player player in _players.Values)
             {
