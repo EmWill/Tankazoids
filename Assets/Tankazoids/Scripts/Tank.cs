@@ -39,7 +39,6 @@ public class Tank : NetworkBehaviour
     public StatManager damageModifiers { get; private set; }
     public StatManager speedModifiers { get; private set; }
 
-    [SyncVar]
     private float _heat;
 
     [SyncVar]
@@ -207,8 +206,6 @@ public class Tank : NetworkBehaviour
 
         if (base.IsServer)
         {
-            ProcessHeatOnTick();
-
             // handle rollback on server
             Replicate(default, true);
         }
@@ -236,6 +233,7 @@ public class Tank : NetworkBehaviour
             weaponContainer.transform.rotation,
             rigidbody2d.velocity,
             rigidbody2d.angularVelocity,
+            _heat,
             speedModifiers,
 
             weapon0Writer.GetArraySegment().Array,
@@ -403,6 +401,8 @@ public class Tank : NetworkBehaviour
         public Vector3 rigidbodyVelocity;
         public float rigidbodyAngularVelocity;
 
+        public float heat;
+
         // todo this is kinda icky i should figure out why it wont auto serialize statmods
         public float speedModifierMultiplier;
         public float speedModifierBonus;
@@ -415,6 +415,7 @@ public class Tank : NetworkBehaviour
         public ReconcileData(Vector3 position, Quaternion rotation, Quaternion weaponRotation,
             Vector3 rigidbodyVelocity,
             float rigidbodyAngularVelocity,
+            float heat,
             StatManager speedModifiers,
             byte[] weapon0ReconcileData,
             byte[] weapon1ReconcileData, 
@@ -428,6 +429,7 @@ public class Tank : NetworkBehaviour
             this.rigidbodyVelocity = rigidbodyVelocity;
             this.rigidbodyAngularVelocity = rigidbodyAngularVelocity;
 
+            this.heat = heat;
             this.speedModifierMultiplier = speedModifiers.Multiplier;
             this.speedModifierBonus = speedModifiers.Bonus;
 
@@ -457,10 +459,11 @@ public class Tank : NetworkBehaviour
             }
         }
 
+        ProcessHeatOnTick();
+
         _treadsComponent.DecayVelocity();
         _treadsComponent.DecayAngularVelocity();
 
-        Vector3 pos = transform.position;
         _treadsComponent.HandleMovement(inputData);
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
@@ -476,6 +479,7 @@ public class Tank : NetworkBehaviour
         rigidbody2d.velocity = reconcileData.rigidbodyVelocity;
         rigidbody2d.angularVelocity = reconcileData.rigidbodyAngularVelocity;
 
+        SetHeat(reconcileData.heat);
         speedModifiers = new StatManager(reconcileData.speedModifierBonus, speedModifiers.Multiplier);
 
         weaponContainer.transform.rotation = reconcileData.rotation;
@@ -548,7 +552,7 @@ public class Tank : NetworkBehaviour
         return maxHeatModifiers.CalculateStat(_bodyComponent.MaxHeat);
     }
 
-    [Server]
+
     private void ProcessHeatOnTick()
     {
         if (_sprinting)
@@ -567,7 +571,22 @@ public class Tank : NetworkBehaviour
         }
     }
 
-    [Server]
+    // local only!
+    private void SetHeat(float amount)
+    {
+        _heat = amount;
+
+        if (_heat > GetMaxHeat() && !_overheated)
+        {
+            Overheat();
+        }
+
+        if (_heat == 0 && _overheated)
+        {
+            Unoverheat();
+        }
+    }
+
     public void AddHeat(float amount)
     {
         if (amount <= 0)
@@ -579,11 +598,10 @@ public class Tank : NetworkBehaviour
 
         if (_heat > GetMaxHeat() && !_overheated)
         {
-            Overheat(base.Owner);
+            Overheat();
         }
     }
 
-    [Server]
     public void RemoveHeat(float amount)
     {
         if (_heat == 0)
@@ -600,20 +618,18 @@ public class Tank : NetworkBehaviour
 
         if (_heat == 0 && _overheated)
         {
-            Unoverheat(base.Owner);
+            Unoverheat();
         }
     }
 
     // todo is this ok? theoretically the speedmods should get synced automatically I think ?
-    [TargetRpc(RunLocally = true)]
-    private void Overheat(NetworkConnection connection)
+    private void Overheat()
     {
         speedModifiers.AddMultiplier(0.25f);
         _overheated = true;
     }
 
-    [TargetRpc(RunLocally = true)]
-    private void Unoverheat(NetworkConnection connection)
+    private void Unoverheat()
     {
         speedModifiers.RemoveMultiplier(0.25f);
         _overheated = false;

@@ -28,8 +28,6 @@ public abstract class AbstractWeapon : AbstractPart
 
     protected virtual void Ability(PreciseTick tick, Vector3 clientTankPosition, Tank.InputData inputData)
     {
-        // Vector3 tankPosition = (base.IsServer) ? _tank.oldPositions[tick] : _tank.transform.position;
-
         Vector3 target = inputData.worldTargetPos - clientTankPosition;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
 
@@ -43,12 +41,13 @@ public abstract class AbstractWeapon : AbstractPart
         {
             PrepareProjectile(proj);
 
-            projectileComponent.TickForTime(GetRollbackTime(tick));
+            float rollbackTime = GetRollbackTime(tick);
+            projectileComponent.TickForTime(rollbackTime);
 
             Spawn(proj, base.Owner);
-            Destroy(proj, _timeToLive);
 
-            _tank.AddHeat(5f);
+            // the projectile has already existed locally for rollbacktime seconds!
+            Destroy(proj, _timeToLive - rollbackTime);
         } else
         {
             Destroy(proj, base.TimeManager.RoundTripTime / 1000f);
@@ -58,6 +57,8 @@ public abstract class AbstractWeapon : AbstractPart
             proj.GetComponent<NetworkObject>().enabled = false;
             proj.GetComponent<NetworkTransform>().enabled = false;
         }
+
+        _tank.AddHeat(5f);
     }
 
     // ripped from RollbackManager.rollback... yuck!
@@ -65,6 +66,7 @@ public abstract class AbstractWeapon : AbstractPart
     {
         float time;
 
+        // constant from interpolation... should keep this in sync somehow but its private! yuck x2!
         pt.Tick -= 2;
         uint pastTicks = (base.TimeManager.Tick - pt.Tick);
         //No ticks to rollback to.
