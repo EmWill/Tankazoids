@@ -54,6 +54,7 @@ public class Projectile : NetworkBehaviour
                 return;
             }
         }
+
         Destroy(gameObject);
     }
 }

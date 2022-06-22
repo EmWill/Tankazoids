@@ -70,6 +70,8 @@ public partial class Tank : NetworkBehaviour
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
+
+        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
 
     public override void OnStartNetwork()
@@ -104,8 +106,6 @@ public partial class Tank : NetworkBehaviour
         EquipTread(defaultTreadPrefab);
 
         _health = GetMaxHealth();
-
-        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
     #endregion Lifecycle
 
