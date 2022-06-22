@@ -9,12 +9,6 @@ public class DiamondTreads : AbstractTread
     private float _turnRate = 550f;
     private float _moveRate = 9f;
 
-    private Rigidbody2D _tankRigidbody;
-
-    private void Awake()
-    {
-    }
-
     public override void OnEquip(Tank tank)
     {
         base.OnEquip(tank);
@@ -24,7 +18,7 @@ public class DiamondTreads : AbstractTread
 
     public override void HandleMovement(Tank.InputData inputData)
     {
-        if (inputData.treadPressed)
+        if (inputData.treadsButton.IsPressed())
         {
             float direction = 0;
             if (inputData.directionalInput.x > 0.3f)
@@ -38,7 +32,7 @@ public class DiamondTreads : AbstractTread
                 _tank.transform.Rotate(0, 0, direction * rotationDistance);
             }
         }
-        else if (!inputData.treadPressed)
+        else
         {
             Vector3 retVal;
             retVal = _tank.transform.position + _tank.transform.up * _moveRate * (float)base.TimeManager.TickDelta;

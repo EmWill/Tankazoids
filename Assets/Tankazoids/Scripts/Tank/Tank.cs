@@ -124,20 +124,20 @@ public partial class Tank : NetworkBehaviour
             _bodyComponent.OnTankTick(inputData);
             _treadsComponent.OnTankTick(inputData);
 
-            if (inputData.bodyPressed && TimeManager.LocalTick % 20 == 0)
+            if (inputData.bodyButton.IsButtonDown() && TimeManager.LocalTick % 20 == 0)
             {
                 RemoveHealth(999);
             }
 
-            if (inputData.swapPressed)
+            if (inputData.swapButton.IsButtonDown())
             {
                 SwapWeapons();
             }
-            if (inputData.weapon0Pressed)
+            if (inputData.weapon0Button.IsPressed())
             {
                 _weapon0Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
             }
-            if (inputData.weapon1Pressed)
+            if (inputData.weapon1Button.IsPressed())
             {
                 _weapon1Component.ActivateAbility(base.RollbackManager.PreciseTick, transform.position, inputData);
             }
@@ -164,9 +164,9 @@ public partial class Tank : NetworkBehaviour
     [Replicate]
     private void Replicate(Tank.InputData inputData, bool asServer, bool replaying = false)
     {
-        if (inputData.sprintPressed != _sprinting)
+        if (inputData.sprintButton.IsPressed() != _sprinting)
         {
-            if (inputData.sprintPressed)
+            if (inputData.sprintButton.IsPressed())
             {
                 speedModifiers.AddMultiplier(1.5f);
                 _sprinting = true;

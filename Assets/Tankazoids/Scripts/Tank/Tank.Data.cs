@@ -13,12 +13,43 @@ using UnityEngine;
 
 public partial class Tank : NetworkBehaviour
 {
-    public enum InputStatus
+    public class ButtonData
     {
-        PRESSED,
-        HELD,
-        RELEASED
-    };
+        public enum InputStatus
+        {
+            BUTTON_DOWN,
+            BUTTON_HELD,
+            BUTTON_UP,
+            NONE
+        };
+
+        private readonly InputStatus status;
+
+        public ButtonData(InputStatus status)
+        {
+            this.status = status;
+        }
+
+        public ButtonData()
+        {
+            this.status = InputStatus.NONE;
+        }
+
+        public bool IsPressed()
+        {
+            return status == InputStatus.BUTTON_DOWN || status == InputStatus.BUTTON_HELD;
+        }
+
+        public bool IsButtonDown()
+        {
+            return status == InputStatus.BUTTON_DOWN;
+        }
+
+        public bool IsButtonUp()
+        {
+            return status == InputStatus.BUTTON_UP;
+        }
+    }
 
     public struct InputData
     {
@@ -26,26 +57,26 @@ public partial class Tank : NetworkBehaviour
 
         public readonly Vector2 directionalInput;
 
-        public bool weapon0Pressed;
-        public bool weapon1Pressed;
-        public bool bodyPressed;
-        public bool treadPressed;
-        public bool sprintPressed;
-        public bool swapPressed;
+        public ButtonData weapon0Button;
+        public ButtonData weapon1Button;
+        public ButtonData bodyButton;
+        public ButtonData treadsButton;
+        public ButtonData sprintButton;
+        public ButtonData swapButton;
 
-        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, bool weapon0Pressed, bool weapon1Pressed,
-            bool bodyPressed, bool treadPressed, bool sprintPressed, bool swapPressed)
+        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, ButtonData weapon0Button, ButtonData weapon1Button,
+            ButtonData bodyButton, ButtonData treadsButton, ButtonData sprintButton, ButtonData swapButton)
         {
             this.worldTargetPos = worldTargetPos;
 
             this.directionalInput = directionalInput;
 
-            this.weapon0Pressed = weapon0Pressed;
-            this.weapon1Pressed = weapon1Pressed;
-            this.bodyPressed = bodyPressed;
-            this.treadPressed = treadPressed;
-            this.sprintPressed = sprintPressed;
-            this.swapPressed = swapPressed;
+            this.weapon0Button = weapon0Button;
+            this.weapon1Button = weapon1Button;
+            this.bodyButton = bodyButton;
+            this.treadsButton = treadsButton;
+            this.sprintButton = sprintButton;
+            this.swapButton = swapButton;
         }
     }
 
@@ -117,13 +148,31 @@ public partial class Tank : NetworkBehaviour
         return new InputData(
                 mouseWorldCoords,
                 new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
-                Input.GetButton("Weapon0"),
-                Input.GetButton("Weapon1"),
-                Input.GetButton("Body"),
-                Input.GetButton("Tread"),
-                Input.GetButton("Sprint"),
-                Input.GetButton("Swap")
+                GetButtonData("Weapon0"),
+                GetButtonData("Weapon1"),
+                GetButtonData("Body"),
+                GetButtonData("Tread"),
+                GetButtonData("Sprint"),
+                GetButtonData("Swap")
             );
+    }
+
+    private static ButtonData GetButtonData(String name)
+    {
+        if (Input.GetButtonDown(name))
+        {
+            return new ButtonData(ButtonData.InputStatus.BUTTON_DOWN);
+        }
+        if (Input.GetButton(name))
+        {
+            return new ButtonData(ButtonData.InputStatus.BUTTON_HELD);
+        }
+        if (Input.GetButtonUp(name))
+        {
+            return new ButtonData(ButtonData.InputStatus.BUTTON_UP);
+        }
+
+        return new ButtonData(ButtonData.InputStatus.NONE);
     }
 
     private ReconcileData GetReconcileData()
