@@ -13,16 +13,25 @@ using UnityEngine;
 
 public partial class Tank : NetworkBehaviour
 {
-    [ServerRpc]
+    [ServerRpc(RunLocally = true)]
     public void SwapWeapons()
     {
-        print("we swapping no stopping");
-        GameObject leftHand = _weapon0Object;
-        EquipWeapon0(_weapon1Object);
-        EquipWeapon1(leftHand);
+        GameObject oldWeapon0Object = _weapon0Object;
+        AbstractWeapon oldWeapon0Component = _weapon0Component;
+
+        _weapon0Object = _weapon1Object;
+        _weapon0Component = _weapon1Component;
+
+        _weapon1Object = oldWeapon0Object;
+        _weapon1Component = oldWeapon0Component;
+
+        // flip the visuals
+        _weapon0Object.transform.localScale = new Vector3(_weapon0Object.transform.localScale.x, _weapon0Object.transform.localScale.y, -_weapon0Object.transform.localScale.z);
+        _weapon1Object.transform.localScale = new Vector3(_weapon1Object.transform.localScale.x, _weapon1Object.transform.localScale.y, -_weapon1Object.transform.localScale.z);
     }
 
     // todo mkae this server_spawnweapon and put equip elsewhere?
+    [Server]
     public void EquipWeapon0(GameObject prefab)
     {
         GameObject oldWeapon = _weapon0Object;
@@ -46,6 +55,7 @@ public partial class Tank : NetworkBehaviour
         Destroy(oldWeapon);
     }
 
+    [Server]
     public void EquipWeapon1(GameObject prefab)
     {
         GameObject oldWeapon = _weapon1Object;
@@ -70,6 +80,7 @@ public partial class Tank : NetworkBehaviour
         Destroy(oldWeapon);
     }
 
+    [Server]
     public void EquipBody(GameObject prefab)
     {
         GameObject oldBody = _bodyObject;
@@ -91,6 +102,7 @@ public partial class Tank : NetworkBehaviour
         Destroy(oldBody);
     }
 
+    [Server]
     public void EquipTread(GameObject prefab)
     {
         GameObject oldTread = _treadObject;

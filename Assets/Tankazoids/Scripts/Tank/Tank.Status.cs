@@ -74,7 +74,6 @@ public partial class Tank : NetworkBehaviour
 
     private void ProcessHeatOnTick()
     {
-        Debug.Log((float)base.TimeManager.TickDelta);
         if (_sprinting)
         {
             AddHeat(30 * (float)base.TimeManager.TickDelta);

@@ -13,59 +13,21 @@ using UnityEngine;
 
 public partial class Tank : NetworkBehaviour
 {
-    public class ButtonData
-    {
-        public enum InputStatus
-        {
-            BUTTON_DOWN,
-            BUTTON_HELD,
-            BUTTON_UP,
-            NONE
-        };
-
-        private readonly InputStatus status;
-
-        public ButtonData(InputStatus status)
-        {
-            this.status = status;
-        }
-
-        public ButtonData()
-        {
-            this.status = InputStatus.NONE;
-        }
-
-        public bool IsPressed()
-        {
-            return status == InputStatus.BUTTON_DOWN || status == InputStatus.BUTTON_HELD;
-        }
-
-        public bool IsButtonDown()
-        {
-            return status == InputStatus.BUTTON_DOWN;
-        }
-
-        public bool IsButtonUp()
-        {
-            return status == InputStatus.BUTTON_UP;
-        }
-    }
-
     public struct InputData
     {
         public readonly Vector3 worldTargetPos;
 
         public readonly Vector2 directionalInput;
 
-        public ButtonData weapon0Button;
-        public ButtonData weapon1Button;
-        public ButtonData bodyButton;
-        public ButtonData treadsButton;
-        public ButtonData sprintButton;
-        public ButtonData swapButton;
+        public InputStatus weapon0Button;
+        public InputStatus weapon1Button;
+        public InputStatus bodyButton;
+        public InputStatus treadsButton;
+        public InputStatus sprintButton;
+        public InputStatus swapButton;
 
-        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, ButtonData weapon0Button, ButtonData weapon1Button,
-            ButtonData bodyButton, ButtonData treadsButton, ButtonData sprintButton, ButtonData swapButton)
+        public InputData(Vector3 worldTargetPos, Vector2 directionalInput, InputStatus weapon0Button, InputStatus weapon1Button,
+            InputStatus bodyButton, InputStatus treadsButton, InputStatus sprintButton, InputStatus swapButton)
         {
             this.worldTargetPos = worldTargetPos;
 
@@ -157,22 +119,39 @@ public partial class Tank : NetworkBehaviour
             );
     }
 
-    private static ButtonData GetButtonData(String name)
+    // this is only a little icky
+    private readonly Dictionary<String, bool> _lastInput = new();
+
+    private InputStatus GetButtonData(String name)
     {
-        if (Input.GetButtonDown(name))
+        bool found = _lastInput.TryGetValue(name, out bool wasButtonPressed);
+
+        if (!found)
         {
-            return new ButtonData(ButtonData.InputStatus.BUTTON_DOWN);
-        }
-        if (Input.GetButton(name))
-        {
-            return new ButtonData(ButtonData.InputStatus.BUTTON_HELD);
-        }
-        if (Input.GetButtonUp(name))
-        {
-            return new ButtonData(ButtonData.InputStatus.BUTTON_UP);
+            wasButtonPressed = false;
         }
 
-        return new ButtonData(ButtonData.InputStatus.NONE);
+        bool isButtonPressed = Input.GetButton(name);
+        _lastInput[name] = isButtonPressed;
+        if (isButtonPressed)
+        {
+            if (wasButtonPressed)
+            {
+                return InputStatus.BUTTON_HELD;
+            } else
+            {
+                return InputStatus.BUTTON_DOWN;
+            }
+        } else
+        {
+            if (wasButtonPressed)
+            {
+                return InputStatus.BUTTON_UP;
+            } else
+            {
+                return InputStatus.NONE; 
+            }
+        }
     }
 
     private ReconcileData GetReconcileData()

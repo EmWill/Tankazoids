@@ -124,7 +124,7 @@ public partial class Tank : NetworkBehaviour
             _bodyComponent.OnTankTick(inputData);
             _treadsComponent.OnTankTick(inputData);
 
-            if (inputData.bodyButton.IsButtonDown() && TimeManager.LocalTick % 20 == 0)
+            if (inputData.bodyButton.IsButtonDown())
             {
                 RemoveHealth(999);
             }
