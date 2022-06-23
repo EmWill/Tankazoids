@@ -23,6 +23,11 @@ public partial class Tank : NetworkBehaviour
         return maxHealthModifiers.CalculateStat(_bodyComponent.MaxHealth);
     }
 
+    public bool IsMaxHealth()
+    {
+        return Mathf.Approximately(GetMaxHealth(), GetHealth());
+    }
+
     [Server]
     public void AddHealth(float amount)
     {

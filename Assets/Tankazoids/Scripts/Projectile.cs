@@ -12,6 +12,7 @@ public class Projectile : NetworkBehaviour
     public float BaseDamage;
 
     public Vector2 velocity;
+    private Rigidbody2D _rigidbody2D;
 
     private float _tickDelta;
 
@@ -19,6 +20,8 @@ public class Projectile : NetworkBehaviour
     {
         InstanceFinder.TimeManager.OnTick += OnTick;
         _tickDelta = (float)InstanceFinder.TimeManager.TickDelta;
+
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     public void OnDestroy()
@@ -33,12 +36,20 @@ public class Projectile : NetworkBehaviour
 
     public void TickForTime(float time)
     {
-        transform.position += new Vector3(velocity.x, velocity.y, 0) * time;
+        _rigidbody2D.MovePosition(_rigidbody2D.position + velocity * time);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (isRollbackDummy) return;
+
+        if (collision.gameObject.TryGetComponent(out Projectile projectileComponent))
+        {
+            if (projectileComponent.Shooter.OwnerId == this.Shooter.OwnerId)
+            {
+                return;
+            }
+        }
 
         if (collision.gameObject.TryGetComponent(out Tank tank))
         {

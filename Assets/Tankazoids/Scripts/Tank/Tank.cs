@@ -70,16 +70,27 @@ public partial class Tank : NetworkBehaviour
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
-
-        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
+
+    uint startTick;
+    float startTime;
+
+    uint reconciles;
 
     public override void OnStartNetwork()
     {
         base.OnStartNetwork();
 
-        InstanceFinder.TimeManager.OnTick += OnTick;
-        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
+        startTick = base.TimeManager.LocalTick;
+        startTime = Time.time;
+
+        base.TimeManager.OnTick += OnTick;
+        base.TimeManager.OnPostTick += OnPostTick;
+
+        if (base.IsServer || base.IsOwner)
+        {
+            rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
+        }
     }
 
     private void OnDestroy()
@@ -112,6 +123,8 @@ public partial class Tank : NetworkBehaviour
     // todo could be a good idea to formalize some of this stuff and make it easier to understand
     private void OnTick()
     {
+        // Debug.Log((base.TimeManager.LocalTick - startTick) / (Time.time - startTime));
+
         if (base.IsDeinitializing) return;
 
         // not replicated!!
@@ -180,8 +193,8 @@ public partial class Tank : NetworkBehaviour
 
         ProcessHeatOnTick();
 
-        _treadsComponent.DecayVelocity();
-        _treadsComponent.DecayAngularVelocity();
+        // _treadsComponent.DecayVelocity();
+        // _treadsComponent.DecayAngularVelocity();
 
         _treadsComponent.HandleMovement(inputData);
 
@@ -192,6 +205,7 @@ public partial class Tank : NetworkBehaviour
     [Reconcile]
     private void Reconcile(ReconcileData reconcileData, bool asServer)
     {
+        Debug.Log("sup");
         transform.position = reconcileData.position;
         transform.rotation = reconcileData.rotation;
 

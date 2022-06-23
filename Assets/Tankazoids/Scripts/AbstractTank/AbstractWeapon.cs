@@ -39,12 +39,11 @@ public abstract class AbstractWeapon : AbstractPart
 
         if (base.IsServer)
         {
-            PrepareProjectile(proj);
-
             float rollbackTime = GetRollbackTime(tick);
             projectileComponent.TickForTime(rollbackTime);
 
             Spawn(proj, base.Owner);
+            PrepareProjectile(proj);
 
             // the projectile has already existed locally for rollbacktime seconds!
             Destroy(proj, _timeToLive - rollbackTime);
@@ -56,6 +55,10 @@ public abstract class AbstractWeapon : AbstractPart
             // this is local only!!
             proj.GetComponent<NetworkObject>().enabled = false;
             proj.GetComponent<NetworkTransform>().enabled = false;
+
+            BoxCollider2D myCollider = _tank.GetComponent<BoxCollider2D>();
+            Collider2D bulletCollider = proj.GetComponent<Collider2D>();
+            Physics2D.IgnoreCollision(myCollider, bulletCollider);
         }
 
         _tank.AddHeat(5f);
