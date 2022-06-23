@@ -43,6 +43,14 @@ public class Projectile : NetworkBehaviour
     {
         if (isRollbackDummy) return;
 
+        if (collision.gameObject.TryGetComponent(out Projectile projectileComponent))
+        {
+            if (projectileComponent.Shooter.OwnerId == this.Shooter.OwnerId)
+            {
+                return;
+            }
+        }
+
         if (collision.gameObject.TryGetComponent(out Tank tank))
         {
             if (tank.OwnerId != Shooter.OwnerId)
