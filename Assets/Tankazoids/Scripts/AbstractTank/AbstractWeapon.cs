@@ -56,6 +56,10 @@ public abstract class AbstractWeapon : AbstractPart
             // this is local only!!
             proj.GetComponent<NetworkObject>().enabled = false;
             proj.GetComponent<NetworkTransform>().enabled = false;
+
+            BoxCollider2D myCollider = _tank.GetComponent<BoxCollider2D>();
+            Collider2D bulletCollider = proj.GetComponent<Collider2D>();
+            Physics2D.IgnoreCollision(myCollider, bulletCollider);
         }
 
         _tank.AddHeat(5f);
