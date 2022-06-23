@@ -70,8 +70,6 @@ public partial class Tank : NetworkBehaviour
         maxHeatModifiers = new();
         damageModifiers = new();
         speedModifiers = new();
-
-        rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
     }
 
     public override void OnStartNetwork()
@@ -80,6 +78,11 @@ public partial class Tank : NetworkBehaviour
 
         base.TimeManager.OnTick += OnTick;
         base.TimeManager.OnPostTick += OnPostTick;
+
+        if (base.IsServer || base.IsOwner)
+        {
+            rigidbody2d.bodyType = RigidbodyType2D.Dynamic;
+        }
     }
 
     private void OnDestroy()
