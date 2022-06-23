@@ -183,19 +183,6 @@ public partial class Tank : NetworkBehaviour
             treadsWriter.GetArraySegment().Array
             );
 
-        return new ReconcileData(
-            transform.position,
-            transform.rotation,
-            weaponContainer.transform.rotation,
-            rigidbody2d.velocity,
-            rigidbody2d.angularVelocity,
-            _heat,
-            speedModifiers,
-
-            weapon0Writer.GetArraySegment().Array,
-            weapon1Writer.GetArraySegment().Array,
-            bodyWriter.GetArraySegment().Array,
-            treadsWriter.GetArraySegment().Array
-            );
+        return reconcileData;
     }
 }

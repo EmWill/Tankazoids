@@ -35,7 +35,7 @@ public abstract class AbstractWeapon : AbstractPart
 
         Projectile projectileComponent = proj.GetComponent<Projectile>();
 
-        projectileComponent.velocity = target2D * _shotSpeed;
+        proj.GetComponent<Rigidbody2D>().velocity = target2D * _shotSpeed;
 
         if (base.IsServer)
         {
@@ -43,7 +43,6 @@ public abstract class AbstractWeapon : AbstractPart
             projectileComponent.TickForTime(rollbackTime);
 
             Spawn(proj, base.Owner);
-            PrepareProjectile(proj);
 
             // the projectile has already existed locally for rollbacktime seconds!
             Destroy(proj, _timeToLive - rollbackTime);
@@ -85,22 +84,5 @@ public abstract class AbstractWeapon : AbstractPart
         time += (float)(percent * base.TimeManager.TickDelta);
 
         return time;
-    }
-
-    // we may want to bufferlast here herm... thinking
-    [ObserversRpc(RunLocally = true)]
-    private void PrepareProjectile(GameObject proj)
-    {
-        //okay it's possible for a collision to happen before here DESTROYING THE OBJECT! watch out lol
-        if (proj != null)
-        {
-            BoxCollider2D myCollider = _tank.GetComponent<BoxCollider2D>();
-            Collider2D bulletCollider = proj.GetComponent<Collider2D>();
-            Physics2D.IgnoreCollision(myCollider, bulletCollider);
-
-            proj.GetComponent<Projectile>().Shooter = _tank;
-
-            bulletCollider.enabled = true;
-        }
     }
 }

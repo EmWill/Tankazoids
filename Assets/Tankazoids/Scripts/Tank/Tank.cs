@@ -72,17 +72,9 @@ public partial class Tank : NetworkBehaviour
         speedModifiers = new();
     }
 
-    uint startTick;
-    float startTime;
-
-    uint reconciles;
-
     public override void OnStartNetwork()
     {
         base.OnStartNetwork();
-
-        startTick = base.TimeManager.LocalTick;
-        startTime = Time.time;
 
         base.TimeManager.OnTick += OnTick;
         base.TimeManager.OnPostTick += OnPostTick;
