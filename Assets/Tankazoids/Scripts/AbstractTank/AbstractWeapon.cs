@@ -39,12 +39,11 @@ public abstract class AbstractWeapon : AbstractPart
 
         if (base.IsServer)
         {
-            PrepareProjectile(proj);
-
             float rollbackTime = GetRollbackTime(tick);
             projectileComponent.TickForTime(rollbackTime);
 
             Spawn(proj, base.Owner);
+            PrepareProjectile(proj);
 
             // the projectile has already existed locally for rollbacktime seconds!
             Destroy(proj, _timeToLive - rollbackTime);
