@@ -78,8 +78,8 @@ public partial class Tank : NetworkBehaviour
     {
         base.OnStartNetwork();
 
-        InstanceFinder.TimeManager.OnTick += OnTick;
-        InstanceFinder.TimeManager.OnPostTick += OnPostTick;
+        base.TimeManager.OnTick += OnTick;
+        base.TimeManager.OnPostTick += OnPostTick;
     }
 
     private void OnDestroy()
