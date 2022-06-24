@@ -14,14 +14,14 @@ using UnityEngine.SceneManagement;
 public class GameLauncher : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI _ipFieldText;
+    private TMP_InputField _ipFieldText;
 
     public void LaunchGame(bool asServer)
     {
         if (!asServer)
         {
             string address = _ipFieldText.text;
-            InstanceFinder.ClientManager.StartConnection(address);
+            InstanceFinder.ClientManager.StartConnection(address, 25565);
         }
         else
         {
@@ -43,7 +43,7 @@ public class GameLauncher : MonoBehaviour
             SceneLoadData sld = new(SCENE_NAME);
             sld.ReplaceScenes = ReplaceOption.All;
             InstanceFinder.SceneManager.LoadGlobalScenes(sld);
-            InstanceFinder.ClientManager.StartConnection("localhost");
+            InstanceFinder.ClientManager.StartConnection("localhost", 25565);
             InstanceFinder.ServerManager.OnServerConnectionState -= LoadSceneAndStartClient;
         }
     }
