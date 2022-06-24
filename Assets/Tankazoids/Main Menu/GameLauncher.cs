@@ -1,5 +1,7 @@
+using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
+using FishNet.Transporting;
 using FishNet.Transporting.Tugboat;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +9,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+
 public class GameLauncher : MonoBehaviour
 {
-    [SerializeField]
-    private NetworkManager _networkManager;
     [SerializeField]
     private TextMeshProUGUI _ipFieldText;
 
@@ -19,15 +21,30 @@ public class GameLauncher : MonoBehaviour
         if (!asServer)
         {
             string address = _ipFieldText.text;
-            _networkManager.ClientManager.StartConnection(address);
+            InstanceFinder.ClientManager.StartConnection(address);
         }
         else
         {
-            _networkManager.ClientManager.StartConnection("localhost");
-            _networkManager.ServerManager.StartConnection();
+            InstanceFinder.ServerManager.OnServerConnectionState += LoadSceneAndStartClient;
+            InstanceFinder.ServerManager.StartConnection();
         }
-        SceneLoadData sld = new SceneLoadData("Main2d");
-        sld.ReplaceScenes = ReplaceOption.All;
-        _networkManager.SceneManager.LoadGlobalScenes(sld);
+    }
+
+    private const string SCENE_NAME = "Main2d";
+    /* Using SCENE_NAME constant for now, will probably change this to lobby scene when we make it.
+     * This case is kind of unique because every other time we are launching scenes e.g. changing maps,
+     * we should be able to guarantee that the server already exists so we won't have to do it on an
+     * event trigger.
+     */
+    private void LoadSceneAndStartClient(ServerConnectionStateArgs args)
+    {
+        if (args.ConnectionState == LocalConnectionState.Started)
+        {
+            SceneLoadData sld = new(SCENE_NAME);
+            sld.ReplaceScenes = ReplaceOption.All;
+            InstanceFinder.SceneManager.LoadGlobalScenes(sld);
+            InstanceFinder.ClientManager.StartConnection("localhost");
+            InstanceFinder.ServerManager.OnServerConnectionState -= LoadSceneAndStartClient;
+        }
     }
 }
