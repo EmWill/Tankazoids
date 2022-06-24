@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Tankazoids/Main2d.unity
-    guid: 8e816afa30ba88341a50b39935ae76b8
-  - enabled: 1
     path: Assets/Tankazoids/MainMenu.unity
     guid: d375c4c367318944c8e7d10c3bc85c40
+  - enabled: 1
+    path: Assets/Tankazoids/Main2d.unity
+    guid: 8e816afa30ba88341a50b39935ae76b8
   m_configObjects: {}

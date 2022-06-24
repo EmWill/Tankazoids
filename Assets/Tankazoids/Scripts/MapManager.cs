@@ -73,7 +73,7 @@ public class MapManager : NetworkBehaviour
         SpawnTankForPlayer(newPlayer, furthestPoint(newPlayer));
     }
 
-    //[Server]
+    [Server]
     public void SpawnTankForPlayer(Player player, Transform location) //asServer bool? umm
     {
         NetworkObject newTank = Instantiate(_tankPrefab, location.position, Quaternion.identity);
@@ -82,8 +82,8 @@ public class MapManager : NetworkBehaviour
         player.tank.setMapManager(this);
 
         //If there are no global scenes 
-        // if (false && _addToDefaultScene)
-        //    _networkManager.SceneManager.AddOwnerToDefaultScene(newTank);
+        if (_addToDefaultScene)
+            _networkManager.SceneManager.AddOwnerToDefaultScene(newTank);
     }
 
     private void Awake()

@@ -42,6 +42,7 @@ public abstract class AbstractWeapon : AbstractPart
             float rollbackTime = GetRollbackTime(tick);
             projectileComponent.TickForTime(rollbackTime);
 
+            projectileComponent.Shooter = _tank;
             Spawn(proj, base.Owner);
 
             // the projectile has already existed locally for rollbacktime seconds!
