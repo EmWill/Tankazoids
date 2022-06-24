@@ -31,7 +31,13 @@ public abstract class AbstractWeapon : AbstractPart
         Vector3 target = inputData.worldTargetPos - clientTankPosition;
         Vector2 target2D = new Vector2(target.x, target.y).normalized;
 
-        GameObject proj = Instantiate(projectile, clientTankPosition, Quaternion.FromToRotation(clientTankPosition, inputData.worldTargetPos));
+        // rotate direction 90 degrees to get gun offset
+        float radian = 90 * Mathf.Deg2Rad;
+        float offsetX = target2D.x * Mathf.Cos(radian) - target2D.y * Mathf.Sin(radian);
+        float offsetY = target2D.x * Mathf.Sin(radian) + target2D.y * Mathf.Cos(radian);
+
+        // using localscale to determine gun side is a hack
+        GameObject proj = Instantiate(projectile, clientTankPosition + 0.2f * Mathf.Sign(transform.localScale.z) * new Vector3(offsetX, offsetY, 0), Quaternion.FromToRotation(clientTankPosition, inputData.worldTargetPos));
 
         Projectile projectileComponent = proj.GetComponent<Projectile>();
 
