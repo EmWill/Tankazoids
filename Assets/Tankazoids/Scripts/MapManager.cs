@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class MapManager : NetworkBehaviour
+public class MapManager : MonoBehaviour
 {
     public class Player
     {
@@ -74,7 +74,6 @@ public class MapManager : NetworkBehaviour
         SpawnTankForPlayer(newPlayer, furthestPoint(newPlayer));
     }
 
-    [Server]
     public void SpawnTankForPlayer(Player player, Transform location) //asServer bool? umm
     {
         NetworkObject newTank = Instantiate(_tankPrefab, location.position, Quaternion.identity);
@@ -162,7 +161,6 @@ public class MapManager : NetworkBehaviour
         return bestLocation;
     }
 
-    [Server]
     public void DespawnTank(Tank tank)
     {
         _tankToPlayer.Remove(tank);
@@ -171,7 +169,6 @@ public class MapManager : NetworkBehaviour
         // Destroy(tank.gameObject);
     }
 
-    [Server]
     public void Respawn(Tank tank)
     {
         DespawnTank(tank);
