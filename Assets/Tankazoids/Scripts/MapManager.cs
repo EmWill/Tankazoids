@@ -31,6 +31,7 @@ public class MapManager : NetworkBehaviour
     [SerializeField]
     private bool _addToDefaultScene = true;
 
+    private Dictionary<Tank, Player> _tankToPlayer;
     private Dictionary<NetworkConnection, Player> _players;
     public List<Transform> _spawnPoints;
 
@@ -80,6 +81,7 @@ public class MapManager : NetworkBehaviour
         _networkManager.ServerManager.Spawn(newTank, player.connection);
         player.tank = newTank.GetComponent<Tank>();
         player.tank.setMapManager(this);
+        _tankToPlayer.Add(player.tank, player);
 
         //If there are no global scenes 
         if (_addToDefaultScene)
@@ -88,6 +90,7 @@ public class MapManager : NetworkBehaviour
 
     private void Awake()
     {
+        _tankToPlayer = new Dictionary<Tank, Player>();
         _players = new Dictionary<NetworkConnection, Player>();
     }
 
@@ -162,6 +165,7 @@ public class MapManager : NetworkBehaviour
     [Server]
     public void DespawnTank(Tank tank)
     {
+        _tankToPlayer.Remove(tank);
         tank.name = "despawned tank";
         tank.Despawn();
         // Destroy(tank.gameObject);
