@@ -75,21 +75,31 @@ public abstract class GameMode : NetworkBehaviour
         standing._score += addition;
 
         int standingIndex = 0;
-        int toSwap = 0;
+        int toSwap = -1;
+        bool prior = true;
         for (int i = 0; i < _leaderboard.Count; i++)
         {
             if (standing == _leaderboard[i]) {
+                prior = false;
                 standingIndex = i;
+                if (toSwap == -1) { toSwap = standingIndex; }
                 continue;
             }
-            if (standing._score > _leaderboard[i]._score)
+            if (prior && standing._score < _leaderboard[i]._score)
             {
                 toSwap = i;
             }
+            else if (!prior && standing._score > _leaderboard[i]._score)
+            {
+
+            }
         }
-        Standing standingToSwap = _leaderboard[toSwap];
-        _leaderboard[toSwap] = standing;
-        _leaderboard[standingIndex] = standingToSwap;
+        if (toSwap != standingIndex)
+        {
+            Standing standingToSwap = _leaderboard[toSwap];
+            _leaderboard[toSwap] = standing;
+            _leaderboard[standingIndex] = standingToSwap;
+        }
 
         UpdateBoard();
     }
