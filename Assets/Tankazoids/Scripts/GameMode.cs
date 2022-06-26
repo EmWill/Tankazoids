@@ -26,8 +26,10 @@ public abstract class GameMode : NetworkBehaviour
         public Standing(Player player)
         {
             _player = player;
+            _name = player.GetName();
             _score = 0f;
         }
+        public string _name;
         public Player _player;
         public float _score;
     }
@@ -57,22 +59,25 @@ public abstract class GameMode : NetworkBehaviour
     private void UpdateBoard()
     {
         string finalText = "";
-        foreach (Standing currStanding in _leaderboard)
+        for (int i = _leaderboard.Count - 1; i >= 0; i--)
         {
-            finalText += currStanding._player.GetName() + ": " + currStanding._score + "\n";
+            Standing currStanding = _leaderboard[i];
+            finalText += currStanding._name + ": " + currStanding._score + "\n";
         }
         _textGUI.SetText(finalText);
     }
 
     public void UpdateScore(Player player, float addition)
     {
+        if (!base.IsServer) { return; }
         Standing standing = GetStanding(player);
         if (standing == null)
         {
             Debug.LogWarning("you are trying to update the score of a player who isn't on the damn list");
             return;
         }
-        standing._score += addition;
+        Standing copy = standing;
+        copy._score += addition;
 
         int standingIndex = 0;
         int toSwap = -1;
@@ -85,20 +90,25 @@ public abstract class GameMode : NetworkBehaviour
                 if (toSwap == -1) { toSwap = standingIndex; }
                 continue;
             }
-            if (prior && standing._score < _leaderboard[i]._score)
+            if (prior && copy._score < _leaderboard[i]._score)
             {
                 toSwap = i;
+                break;
             }
-            else if (!prior && standing._score > _leaderboard[i]._score)
+            else if (!prior && copy._score > _leaderboard[i]._score)
             {
-
+                toSwap = i;
             }
         }
         if (toSwap != standingIndex)
         {
             Standing standingToSwap = _leaderboard[toSwap];
-            _leaderboard[toSwap] = standing;
+            _leaderboard[toSwap] = copy;
             _leaderboard[standingIndex] = standingToSwap;
+        }
+        else
+        {
+            _leaderboard[standingIndex] = copy;
         }
 
         UpdateBoard();
