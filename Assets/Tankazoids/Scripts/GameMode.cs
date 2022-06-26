@@ -8,8 +8,10 @@ using UnityEngine;
 public abstract class GameMode : NetworkBehaviour
 {
     [SyncObject]
-    private readonly SyncList<Standing> _leaderboard = new SyncList<Standing>();
-    private TextMeshProUGUI _textGUI;
+    protected readonly SyncList<Standing> _leaderboard = new SyncList<Standing>();
+    protected TextMeshProUGUI _textGUI;
+    protected bool _active = true;
+    public float MAX_TIME = 45;
 
     private void Awake()
     {
@@ -62,7 +64,7 @@ public abstract class GameMode : NetworkBehaviour
         for (int i = _leaderboard.Count - 1; i >= 0; i--)
         {
             Standing currStanding = _leaderboard[i];
-            finalText += currStanding._name + ": " + currStanding._score + "\n";
+            finalText += currStanding._name + ": " + (int) (currStanding._score * TimeManager.TickDelta) + "\n";
         }
         _textGUI.SetText(finalText);
     }
@@ -70,6 +72,7 @@ public abstract class GameMode : NetworkBehaviour
     public void UpdateScore(Player player, float addition)
     {
         if (!base.IsServer) { return; }
+        if (!_active) { return; }
         Standing standing = GetStanding(player);
         if (standing == null)
         {
@@ -78,6 +81,11 @@ public abstract class GameMode : NetworkBehaviour
         }
         Standing copy = standing;
         copy._score += addition;
+
+        if (copy._score * TimeManager.TickDelta >= MAX_TIME)
+        {
+            EndGame();
+        }
 
         int standingIndex = 0;
         int toSwap = -1;
@@ -111,6 +119,15 @@ public abstract class GameMode : NetworkBehaviour
             _leaderboard[standingIndex] = copy;
         }
 
+        UpdateBoard();
+    }
+
+    protected void EndGame()
+    {
+        _active = false;
+        Standing copy = _leaderboard[0];
+        copy._name += ": WINNER";
+        _leaderboard[0] = copy;
         UpdateBoard();
     }
 
