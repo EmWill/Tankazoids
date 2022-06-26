@@ -52,12 +52,28 @@ public partial class Tank : NetworkBehaviour
 
     private bool _dead = false;
 
+    private Player _player;
+
     private MapManager _mapManager;
 
     public delegate void OnHitHandler(ref float dmg);
     public event OnHitHandler OnHit;
 
     public Rigidbody2D rigidbody2d { get; private set; }
+
+    public void SetPlayer(Player player) {
+        if (player == _player)
+        {
+            return;
+        }
+        _player = player;
+        _player.SetTank(this);
+    }
+
+    public Player GetPlayer()
+    {
+        return _player;
+    }
 
     #region Lifecycle
     private void Awake()

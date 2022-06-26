@@ -8,6 +8,7 @@ public class Hill : NetworkBehaviour
     private MapManager _manager;
     private List<Tank> _residents;
     private SpriteRenderer _sr;
+    public KotHManager _gameMode;
 
     private void Awake()
     {
@@ -25,6 +26,25 @@ public class Hill : NetworkBehaviour
     void Update()
     {
         
+    }
+
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+
+        base.TimeManager.OnTick += OnTick;
+
+    }
+
+    private void OnTick()
+    {
+        if (base.IsServer)
+        {
+            if (_residents.Count == 1)
+            {
+                _gameMode.UpdateScore(_residents[0].GetPlayer(), 1f);
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -56,6 +76,7 @@ public class Hill : NetworkBehaviour
         else if (_residents.Count == 1)
         {
             _sr.color = Color.blue;
+            _gameMode.UpdateScore(_residents[0].GetPlayer(), 1f);
         }
         else
         {
