@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9170840646698823064}
-  - component: {fileID: -7715518736866777392}
   - component: {fileID: 2615850986456712606}
   - component: {fileID: 1918144889854905933}
   - component: {fileID: -5822064554836150010}
   - component: {fileID: 4564325043337279678}
   - component: {fileID: -6676355642769655212}
+  - component: {fileID: -1835299345932065280}
   m_Layer: 6
   m_Name: DebugProjectile
   m_TagString: Untagged
@@ -38,48 +38,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-7715518736866777392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7598151544206760318}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 0
-  _addedNetworkObject: {fileID: 2615850986456712606}
-  _networkObjectCache: {fileID: 2615850986456712606}
-  _synchronizeParent: 0
-  _packing:
-    Position: 1
-    Rotation: 1
-    Scale: 0
-  _interpolation: 2
-  _extrapolation: 0
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  _clientAuthoritative: 0
-  _sendToOwner: 1
-  _interval: 1
-  _synchronizePosition: 1
-  _positionSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeRotation: 0
-  _rotationSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeScale: 0
-  _scaleSnapping:
-    X: 0
-    Y: 0
-    Z: 0
 --- !u!114 &2615850986456712606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,8 +51,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkBehaviours:
-  - {fileID: -7715518736866777392}
+  - {fileID: 0}
   - {fileID: 1918144889854905933}
+  - {fileID: -1835299345932065280}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -124,7 +83,6 @@ MonoBehaviour:
   isRollbackDummy: 0
   Shooter: {fileID: 0}
   BaseDamage: 50
-  velocity: {x: 0, y: 0}
 --- !u!58 &-5822064554836150010
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -224,6 +182,29 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-1835299345932065280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598151544206760318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 402926ef33e0a894d9fec352693988ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 2615850986456712606}
+  _networkObjectCache: {fileID: 2615850986456712606}
+  _graphicalObject: {fileID: 3778872143257610160}
+  _smoothTicks: 1
+  _smoothingDuration: 0.125
+  _predictionType: 2
+  _rigidbody: {fileID: 0}
+  _rigidbody2d: {fileID: -6676355642769655212}
+  _networkTransform: {fileID: 0}
+  _predictionRatio: 0
 --- !u!1 &9076445479882123054
 GameObject:
   m_ObjectHideFlags: 0

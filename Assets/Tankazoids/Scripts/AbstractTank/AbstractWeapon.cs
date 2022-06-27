@@ -59,6 +59,7 @@ public abstract class AbstractWeapon : AbstractPart
             projectileComponent.isRollbackDummy = true;
 
             // this is local only!!
+            proj.GetComponent<Rigidbody2D>().simulated = false;
             proj.GetComponent<NetworkObject>().enabled = false;
             proj.GetComponent<NetworkTransform>().enabled = false;
 
