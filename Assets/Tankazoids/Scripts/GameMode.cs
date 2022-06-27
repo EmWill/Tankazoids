@@ -87,37 +87,20 @@ public abstract class GameMode : NetworkBehaviour
             EndGame();
         }
 
-        int standingIndex = 0;
-        int toSwap = -1;
-        bool prior = true;
+        _leaderboard.Remove(standing); // is this slow? these lists are tiny but
+        int toSwap = 0;
         for (int i = 0; i < _leaderboard.Count; i++)
         {
-            if (standing == _leaderboard[i]) {
-                prior = false;
-                standingIndex = i;
-                if (toSwap == -1) { toSwap = standingIndex; }
-                continue;
-            }
-            if (prior && copy._score < _leaderboard[i]._score)
+            if (copy._score > _leaderboard[i]._score)
             {
-                toSwap = i;
+                toSwap++;
+            }
+            else
+            {
                 break;
             }
-            else if (!prior && copy._score > _leaderboard[i]._score)
-            {
-                toSwap = i;
-            }
         }
-        if (toSwap != standingIndex)
-        {
-            Standing standingToSwap = _leaderboard[toSwap];
-            _leaderboard[toSwap] = copy;
-            _leaderboard[standingIndex] = standingToSwap;
-        }
-        else
-        {
-            _leaderboard[standingIndex] = copy;
-        }
+        _leaderboard.Insert(toSwap, copy); // is this slow? these lists are tiny but
 
         UpdateBoard();
     }
