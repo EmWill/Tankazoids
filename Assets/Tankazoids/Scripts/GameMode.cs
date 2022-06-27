@@ -82,11 +82,6 @@ public abstract class GameMode : NetworkBehaviour
         Standing copy = standing;
         copy._score += addition;
 
-        if (copy._score * TimeManager.TickDelta >= MAX_TIME)
-        {
-            EndGame();
-        }
-
         _leaderboard.Remove(standing); // is this slow? these lists are tiny but
         int toSwap = 0;
         for (int i = 0; i < _leaderboard.Count; i++)
@@ -101,6 +96,11 @@ public abstract class GameMode : NetworkBehaviour
             }
         }
         _leaderboard.Insert(toSwap, copy); // is this slow? these lists are tiny but
+
+        if (copy._score * TimeManager.TickDelta >= MAX_TIME)
+        {
+            EndGame();
+        }
 
         UpdateBoard();
     }
