@@ -23,7 +23,7 @@ public abstract class GameMode : NetworkBehaviour
     {
         public Standing()
         {
-            Debug.LogError("DON'T USE THIS EVER");
+            //Debug.LogError("DON'T USE THIS EVER");
         }
         public Standing(Player player)
         {

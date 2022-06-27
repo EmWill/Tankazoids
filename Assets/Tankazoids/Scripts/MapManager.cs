@@ -18,7 +18,7 @@ public class Player
 
     public Player()
     {
-        Debug.LogError("DON'T EVER USER DEFAULT PLAYER CONSTRUCTOR");
+        //Debug.LogError("DON'T EVER USER DEFAULT PLAYER CONSTRUCTOR");
     }
 
     public Player(NetworkConnection connection, Tank tank)
