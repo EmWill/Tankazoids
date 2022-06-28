@@ -1,4 +1,5 @@
 using FishNet.Component.ColliderRollback;
+using FishNet.Component.Prediction;
 using FishNet.Component.Transforming;
 using FishNet.Object;
 using System.Collections;
@@ -61,7 +62,7 @@ public abstract class AbstractWeapon : AbstractPart
             // this is local only!!
             proj.GetComponent<Rigidbody2D>().simulated = false;
             proj.GetComponent<NetworkObject>().enabled = false;
-            proj.GetComponent<NetworkTransform>().enabled = false;
+            proj.GetComponent<PredictedObject>().enabled = false;
 
             BoxCollider2D myCollider = _tank.GetComponent<BoxCollider2D>();
             Collider2D bulletCollider = proj.GetComponent<Collider2D>();
