@@ -63,7 +63,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 0}
   _rigidbody2d: {fileID: -6676355642769655212}
   _networkTransform: {fileID: 0}
-  _predictionRatio: 0.5
+  _predictionRatio: 0
 --- !u!114 &2615850986456712606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,6 +79,8 @@ MonoBehaviour:
   _networkBehaviours:
   - {fileID: -1835299345932065280}
   - {fileID: 1918144889854905933}
+  - {fileID: -2921836679675764333}
+  - {fileID: 0}
   SceneTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -157,9 +159,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ab2368f1bee9849917d0450cb88d48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 2615850986456712606}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 2615850986456712606}
   obj: {fileID: 4978106793541330619, guid: aa339ae7d14a77a4f94f094b137d3259, type: 3}
 --- !u!1 &9076445479882123054
 GameObject:

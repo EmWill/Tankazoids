@@ -55,6 +55,8 @@ public class Projectile : NetworkBehaviour
     {
         if (isRollbackDummy) return;
 
+        Debug.Log(_rigidbody2D.velocity);
+
         if (collision.gameObject.TryGetComponent(out Projectile projectileComponent))
         {
             if (projectileComponent.Shooter.OwnerId == this.Shooter.OwnerId)
