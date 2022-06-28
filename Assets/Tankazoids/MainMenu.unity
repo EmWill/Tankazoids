@@ -436,11 +436,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdaae44044276a49a52229c1597e33b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tickRate: 64
+  _tickRate: 60
   _pingInterval: 1
   _timingInterval: 2
   _physicsMode: 1
-  _maximumBufferedInputs: 15
+  _maximumBufferedInputs: 5
 --- !u!114 &891292855
 MonoBehaviour:
   m_ObjectHideFlags: 0

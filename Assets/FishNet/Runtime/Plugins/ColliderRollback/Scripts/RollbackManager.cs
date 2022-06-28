@@ -1,4 +1,5 @@
 ﻿using FishNet.Managing;
+using FishNet.Managing.Timing;
 using FishNet.Transporting;
 using System;
 using UnityEngine;
@@ -33,17 +34,15 @@ namespace FishNet.Component.ColliderRollback
         /// <summary>
         /// Returns the current PreciseTick.
         /// </summary>
+        [Obsolete("Use TimeManager.GetPreciseTick(TickType.LastPacketTick) instead.")]
         public PreciseTick PreciseTick
         {
             get
             {
                 if (_networkManager == null)
-                    return new PreciseTick(0, 0);
+                    return default;
 
-                return new PreciseTick(
-                    _networkManager.TimeManager.LastPacketTick,
-                    _networkManager.TimeManager.TickPercent
-                    );
+                return _networkManager.TimeManager.GetPreciseTick(TickType.LastPacketTick);
             }
         }
 
@@ -168,7 +167,7 @@ namespace FishNet.Component.ColliderRollback
             else
             {
                 //Roll back 1 tick + percent.
-                float percent = (_networkManager.TimeManager.TickPercent / 100f);
+                float percent = (float)_networkManager.TimeManager.GetTickPercent();
                 time = tickDelta + (tickDelta * percent);
             }
 

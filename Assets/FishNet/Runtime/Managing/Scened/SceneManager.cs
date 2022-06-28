@@ -75,6 +75,21 @@ namespace FishNet.Managing.Scened
         public Dictionary<Scene, HashSet<NetworkConnection>> SceneConnections { get; private set; } = new Dictionary<Scene, HashSet<NetworkConnection>>();
         #endregion
 
+        #region Serialized.
+        /// <summary>
+        /// True to move objects visible to clientHost that are within an unloading scene. This ensures the objects are despawned on the client side rather than when the scene is destroyed.
+        /// </summary>
+        [Tooltip("True to move objects visible to clientHost that are within an unloading scene. This ensures the objects are despawned on the client side rather than when the scene is destroyed.")]
+        [SerializeField]
+        private bool _moveClientHostObjects = true;
+        /// <summary>
+        /// True to automatically set active scenes when loading and unloading scenes.
+        /// </summary>
+        [Tooltip("True to automatically set active scenes when loading and unloading scenes.")]
+        [SerializeField]
+        private bool _setActiveScene = true;
+        #endregion
+
         #region Internal.
         /// <summary>
         /// Called after the active scene has been set, immediately after scene loads.
@@ -432,7 +447,7 @@ namespace FishNet.Managing.Scened
         /// Invokes that a scene load has ended. Only called after a valid scene has loaded.
         /// </summary>
         /// <param name="qd"></param>
-        private void InvokeOnSceneLoadEnd(LoadQueueData qd, List<string> requestedLoadScenes, List<Scene> loadedScenes)
+        private void InvokeOnSceneLoadEnd(LoadQueueData qd, List<string> requestedLoadScenes, List<Scene> loadedScenes, string[] unloadedSceneNames)
         {
             //Make new list to not destroy original data.
             List<string> skippedScenes = requestedLoadScenes.ToList();
@@ -440,7 +455,7 @@ namespace FishNet.Managing.Scened
             for (int i = 0; i < loadedScenes.Count; i++)
                 skippedScenes.Remove(loadedScenes[i].name);
 
-            SceneLoadEndEventArgs args = new SceneLoadEndEventArgs(qd, loadedScenes.ToArray(), skippedScenes.ToArray());
+            SceneLoadEndEventArgs args = new SceneLoadEndEventArgs(qd, skippedScenes.ToArray(), loadedScenes.ToArray(), unloadedSceneNames);
             OnLoadEnd?.Invoke(args);
         }
         /// <summary>
@@ -843,6 +858,10 @@ namespace FishNet.Managing.Scened
             if (unloadableScenes.Count > 0 || loadableScenes.Count > 0)
                 InvokeOnSceneLoadStart(data);
 
+            //Unloaded scenes by name. Only used for information within callbacks.
+            string[] unloadedNames = new string[unloadableScenes.Count];
+            for (int i = 0; i < unloadableScenes.Count; i++)
+                unloadedNames[i] = unloadableScenes[i].name;
             /* Before unloading if !asServer and !asHost and replacing scenes
              * then move all non scene networked objects to the moved
              * objects holder. Otherwise network objects would get destroyed
@@ -1036,7 +1055,6 @@ namespace FishNet.Managing.Scened
                     yield return null;
             }
 
-            /* Set active scene. */
             SetActiveScene();
 
             //Only the server needs to find scene handles to send to client. Client will send these back to the server.
@@ -1110,7 +1128,7 @@ namespace FishNet.Managing.Scened
                 _clientManager.Broadcast(msg);
             }
 
-            InvokeOnSceneLoadEnd(data, requestedLoadSceneNames, loadedScenes);
+            InvokeOnSceneLoadEnd(data, requestedLoadSceneNames, loadedScenes, unloadedNames);
         }
 
         /// <summary>
@@ -1299,6 +1317,8 @@ namespace FishNet.Managing.Scened
                 }
             }
 
+            SetActiveScene();
+
             /* If running as server then make sure server
              * is still active after the unloads. If so
              * send out unloads to clients. */
@@ -1346,11 +1366,13 @@ namespace FishNet.Managing.Scened
         #endregion
 
         /// <summary>
-        /// Moves objects to despawnLater in scene if they are visible to the clientHost.
+        /// Move objects visible to clientHost that are within an unloading scene.This ensures the objects are despawned on the client side rather than when the scene is destroyed.
         /// </summary>
         /// <param name="scene"></param>
         private void MoveClientHostObjects(Scene scene, bool asServer)
         {
+            if (!_moveClientHostObjects)
+                return;
             /* The asServer isn't really needed. I could only call
              * this method when asServer is true. But for the sake
              * of preventing user-error (me being the user this time)
@@ -1379,6 +1401,9 @@ namespace FishNet.Managing.Scened
                     continue;
                 //ClientHost doesn't have visibility.
                 if (!nob.Observers.Contains(clientConn))
+                    continue;
+                //Cannot move if not root.
+                if (nob.transform.root != null)
                     continue;
 
                 /* If here nob is in the same being
@@ -1852,6 +1877,9 @@ namespace FishNet.Managing.Scened
         /// </summary>
         private void SetActiveScene()
         {
+            if (!_setActiveScene)
+                return;
+
             Scene s = default;
             if (_globalScenes != null && _globalScenes.Length > 0)
                 s = GetScene(_globalScenes[0]);

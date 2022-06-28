@@ -1,3 +1,4 @@
+using FishNet;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,16 @@ public class CameraDirectorController : MonoBehaviour
     public Camera myCamera;
 
     private Vector3 _velocity = Vector3.zero;
+
+    private void Awake()
+    {
+        // InstanceFinder.TimeManager.OnTick += OnTick;
+    }
+
+    private void OnDestroy()
+    {
+        // InstanceFinder.TimeManager.OnTick -= OnTick;
+    }
 
     void Update()
     {
@@ -29,6 +40,6 @@ public class CameraDirectorController : MonoBehaviour
         Vector3 mouseWorldCoords = new(worldPointCoords.x, worldPointCoords.y, 0);
         Vector3 targetLookAtPosition = mouseWorldCoords * (mousePlayerInterpolation) + (followingObject.transform.position * (1 - mousePlayerInterpolation));
 
-        transform.position = Vector3.SmoothDamp(transform.position, targetLookAtPosition, ref _velocity, dampening);
+        transform.position = Vector3.SmoothDamp(transform.position, targetLookAtPosition, ref _velocity, dampening * (float)InstanceFinder.TimeManager.TickDelta);
     }
 }

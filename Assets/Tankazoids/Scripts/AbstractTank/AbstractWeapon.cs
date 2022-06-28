@@ -1,6 +1,7 @@
 using FishNet.Component.ColliderRollback;
 using FishNet.Component.Prediction;
 using FishNet.Component.Transforming;
+using FishNet.Managing.Timing;
 using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,15 +43,16 @@ public abstract class AbstractWeapon : AbstractPart
 
         Projectile projectileComponent = proj.GetComponent<Projectile>();
 
-        proj.GetComponent<Rigidbody2D>().velocity = target2D * _shotSpeed;
-
         if (base.IsServer)
         {
-            float rollbackTime = GetRollbackTime(tick);
-            projectileComponent.TickForTime(rollbackTime);
 
             projectileComponent.Shooter = _tank;
-            Spawn(proj, base.Owner);
+            Spawn(proj);
+
+            proj.GetComponent<Rigidbody2D>().velocity = target2D * _shotSpeed;
+
+            float rollbackTime = GetRollbackTime(tick);
+            projectileComponent.TickForTime(rollbackTime);
 
             // the projectile has already existed locally for rollbacktime seconds!
             Destroy(proj, _timeToLive - rollbackTime);
@@ -60,7 +62,7 @@ public abstract class AbstractWeapon : AbstractPart
             projectileComponent.isRollbackDummy = true;
 
             // this is local only!!
-            proj.GetComponent<Rigidbody2D>().simulated = false;
+            proj.GetComponent<Collider2D>().isTrigger = true;
             proj.GetComponent<NetworkObject>().enabled = false;
             proj.GetComponent<PredictedObject>().enabled = false;
 
