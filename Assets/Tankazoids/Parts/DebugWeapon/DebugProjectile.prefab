@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1918144889854905933}
   - component: {fileID: -5822064554836150010}
   - component: {fileID: -6676355642769655212}
+  - component: {fileID: -2921836679675764333}
   m_Layer: 6
   m_Name: DebugProjectile
   m_TagString: Untagged
@@ -144,6 +145,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-2921836679675764333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598151544206760318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79ab2368f1bee9849917d0450cb88d48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 2615850986456712606}
+  _networkObjectCache: {fileID: 0}
+  obj: {fileID: 4978106793541330619, guid: aa339ae7d14a77a4f94f094b137d3259, type: 3}
 --- !u!1 &9076445479882123054
 GameObject:
   m_ObjectHideFlags: 0
