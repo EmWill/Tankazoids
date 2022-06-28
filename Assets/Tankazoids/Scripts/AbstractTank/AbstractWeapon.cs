@@ -43,16 +43,15 @@ public abstract class AbstractWeapon : AbstractPart
 
         Projectile projectileComponent = proj.GetComponent<Projectile>();
 
+        proj.GetComponent<Rigidbody2D>().velocity = target2D * _shotSpeed;
+
         if (base.IsServer)
         {
+            float rollbackTime = GetRollbackTime(tick);
+            projectileComponent.TickForTime(rollbackTime);
 
             projectileComponent.Shooter = _tank;
             Spawn(proj);
-
-            proj.GetComponent<Rigidbody2D>().velocity = target2D * _shotSpeed;
-
-            float rollbackTime = GetRollbackTime(tick);
-            projectileComponent.TickForTime(rollbackTime);
 
             // the projectile has already existed locally for rollbacktime seconds!
             Destroy(proj, _timeToLive - rollbackTime);

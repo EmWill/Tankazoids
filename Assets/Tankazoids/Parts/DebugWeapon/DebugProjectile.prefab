@@ -62,7 +62,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 0}
   _rigidbody2d: {fileID: -6676355642769655212}
   _networkTransform: {fileID: 0}
-  _predictionRatio: 0
+  _predictionRatio: 0.5
 --- !u!114 &2615850986456712606
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1207,7 +1207,6 @@ MonoBehaviour:
   - {fileID: 509006625}
   - {fileID: 982873270}
   - {fileID: 1005651271}
-  - {fileID: 1160690542}
   - {fileID: 1170213956}
   - {fileID: 1822247149}
   - {fileID: 2105358612}
@@ -1587,7 +1586,6 @@ MonoBehaviour:
   - {fileID: 509006625}
   - {fileID: 982873270}
   - {fileID: 1005651271}
-  - {fileID: 1160690542}
   - {fileID: 1170213956}
   - {fileID: 1822247149}
   - {fileID: 2105358612}
@@ -2715,7 +2713,6 @@ MonoBehaviour:
   - {fileID: 509006625}
   - {fileID: 982873270}
   - {fileID: 1005651271}
-  - {fileID: 1160690542}
   - {fileID: 1170213956}
   - {fileID: 1822247149}
   - {fileID: 2105358612}
@@ -3132,7 +3129,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1160690542
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3162,7 +3159,6 @@ MonoBehaviour:
   - {fileID: 509006625}
   - {fileID: 982873270}
   - {fileID: 1005651271}
-  - {fileID: 1160690542}
   - {fileID: 1170213956}
   - {fileID: 1822247149}
   - {fileID: 2105358612}

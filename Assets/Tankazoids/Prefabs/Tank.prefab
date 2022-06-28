@@ -416,7 +416,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 2808446063702463339}
   _networkObjectCache: {fileID: 2808446063702463339}
   _graphicalObject: {fileID: 8955394069440702962}
-  _smoothTicks: 0
+  _smoothTicks: 1
   _durationType: 0
   _smoothingDuration: 0.01
   _enableTeleport: 0
