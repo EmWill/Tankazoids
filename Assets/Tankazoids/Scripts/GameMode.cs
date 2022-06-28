@@ -108,7 +108,7 @@ public abstract class GameMode : NetworkBehaviour
     protected void EndGame()
     {
         _active = false;
-        Standing copy = _leaderboard[0];
+        Standing copy = _leaderboard[_leaderboard.Count -1];
         copy._name += ": WINNER";
         _leaderboard[0] = copy;
         UpdateBoard();
