@@ -50,7 +50,7 @@ public class HeavenTreads : AbstractTread
     }
 
 
-    public override void HandleMovement(Tank.InputData inputData)
+    public override Vector3 HandleMovement(Tank.InputData inputData)
     {
         float _moveRate = _tank.speedModifiers.CalculateStat(this._moveRate);
         float direction = 0;
@@ -93,8 +93,10 @@ public class HeavenTreads : AbstractTread
             retVal = _tank.transform.up * motion * (_moveRate + _currBoost * _moveRate);
             retVal -= _tank.transform.up * _currBoost * _moveRate;
         }
-        _tankRigidbody.velocity = retVal;
-        //_tank.transform.position = retVal;
+        //_tankRigidbody.velocity = retVal;
+
+
+        return retVal;
     }
 
     public override void GetReconcileData(Writer writer)

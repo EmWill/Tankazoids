@@ -44,6 +44,8 @@ public partial class Tank : NetworkBehaviour
     [SyncVar]
     private float _health;
 
+    private bool _knockedBack = false;
+
     // synced by replicate
     private bool _sprinting = false;
 
@@ -204,7 +206,8 @@ public partial class Tank : NetworkBehaviour
         // _treadsComponent.DecayVelocity();
         // _treadsComponent.DecayAngularVelocity();
 
-        _treadsComponent.HandleMovement(inputData);
+        Vector3 intendedVelocity = _treadsComponent.HandleMovement(inputData);
+        rigidbody2d.velocity = intendedVelocity;
 
         Vector3 difference = inputData.worldTargetPos - new Vector3(weaponContainer.transform.position.x, weaponContainer.transform.position.y, 0);
         weaponContainer.transform.eulerAngles = new Vector3(Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 90, -90, -90);
@@ -223,6 +226,8 @@ public partial class Tank : NetworkBehaviour
         Debug.Log(_heat - reconcileData.heat);
         SetHeat(reconcileData.heat);
         speedModifiers = new StatManager(reconcileData.speedModifierBonus, speedModifiers.Multiplier);
+
+        _knockedBack = reconcileData.knockedBack;
 
         weaponContainer.transform.rotation = reconcileData.rotation;
 
