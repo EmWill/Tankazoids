@@ -15,6 +15,11 @@ public abstract class AbstractTread : AbstractPart
         _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
 
+    public virtual void OnKnockBackEnd()
+    {
+        return; // AWESOME FUNCTION
+    }
+
     public virtual void DecayVelocity()
     {
         if (_tankRigidbody.velocity.magnitude < .25f)
@@ -27,6 +32,9 @@ public abstract class AbstractTread : AbstractPart
         }
     }
 
+
+    // probably not gonna use this
+    /*
     public virtual void DecayAngularVelocity()
     {
         if (_tankRigidbody.angularVelocity < .25f)
@@ -38,4 +46,5 @@ public abstract class AbstractTread : AbstractPart
             _tankRigidbody.angularVelocity -= _tankRigidbody.angularVelocity * 0.75f * (float)base.TimeManager.TickDelta;
         }
     }
+    */
 }

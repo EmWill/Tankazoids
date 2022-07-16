@@ -29,7 +29,7 @@ public abstract class AbstractPart : NetworkBehaviour
     // do we really need this ?
     public virtual void OnTankTick(Tank.InputData inputData) {}
 
-    public virtual void HandleMovement(Tank.InputData inputData) {}
+    public virtual Vector3 HandleMovement(Tank.InputData inputData) { return new Vector3(0, 0, 0); }
 
     public virtual void GetReconcileData(Writer writer) {}
 

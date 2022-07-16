@@ -57,6 +57,8 @@ public partial class Tank : NetworkBehaviour
         public float speedModifierMultiplier;
         public float speedModifierBonus;
 
+        public bool knockedBack;
+
         public byte[] weapon0ReconcileData;
         public byte[] weapon1ReconcileData;
         public byte[] bodyReconcileData;
@@ -67,6 +69,7 @@ public partial class Tank : NetworkBehaviour
             float rigidbodyAngularVelocity,
             float heat,
             StatManager speedModifiers,
+            bool knockedBack,
             byte[] weapon0ReconcileData,
             byte[] weapon1ReconcileData,
             byte[] bodyReconcileData,
@@ -82,6 +85,8 @@ public partial class Tank : NetworkBehaviour
             this.heat = heat;
             this.speedModifierMultiplier = speedModifiers.Multiplier;
             this.speedModifierBonus = speedModifiers.Bonus;
+
+            this.knockedBack = knockedBack;
 
             this.weaponRotation = weaponRotation;
 
@@ -176,6 +181,7 @@ public partial class Tank : NetworkBehaviour
             rigidbody2d.angularVelocity,
             _heat,
             speedModifiers,
+            _knockedBack,
 
             weapon0Writer.GetArraySegment().Array,
             weapon1Writer.GetArraySegment().Array,

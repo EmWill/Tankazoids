@@ -16,7 +16,7 @@ public class DiamondTreads : AbstractTread
         _tankRigidbody = tank.gameObject.GetComponent<Rigidbody2D>();
     }
 
-    public override void HandleMovement(Tank.InputData inputData)
+    public override Vector3 HandleMovement(Tank.InputData inputData)
     {
         if (inputData.treadsButton.IsPressed())
         {
@@ -31,12 +31,15 @@ public class DiamondTreads : AbstractTread
                 float rotationDistance = currentTurnRate * (float)base.TimeManager.TickDelta;
                 _tank.transform.Rotate(0, 0, direction * rotationDistance);
             }
+            return new Vector3(0f, 0f, 0f);
         }
         else
         {
             Vector3 retVal;
-            retVal = _tank.transform.position + _tank.transform.up * _moveRate * (float)base.TimeManager.TickDelta;
-            _tank.transform.position = retVal;
+            retVal = _moveRate * _tank.transform.up;
+            return retVal;
+            //retVal = _tank.transform.position + _tank.transform.up * _moveRate * (float)base.TimeManager.TickDelta;
+          //  _tank.transform.position = retVal;
         }
     }
 
