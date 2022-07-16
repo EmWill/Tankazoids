@@ -395,7 +395,7 @@ namespace FishNet.Component.Prediction
         /// </summary>
         /// <param name="state"></param>
         [ObserversRpc(IncludeOwner = false, BufferLast = true)]
-        private void ObserversSendRigidbody2DState(Rigidbody2DState state, Channel channel = Channel.Reliable)
+        private void ObserversSendRigidbody2DState(Rigidbody2DState state, Channel channel = Channel.Unreliable)
         {
             if (!CanPredict())
                 return;

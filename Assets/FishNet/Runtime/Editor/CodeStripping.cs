@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Xml.Serialization;
 
 #if UNITY_EDITOR
+using FishNet.Editing.PrefabCollectionGenerator;
 using UnityEditor.Compilation;
 using UnityEditor.Build.Reporting;
 using UnityEditor;
@@ -107,18 +108,18 @@ namespace FishNet.Configuring
             }
         }
 
-        //PROSTART
-        #region Pro stuff.
         private static object _compilationContext;
         public int callbackOrder => 0;
-
 #if UNITY_EDITOR
 
         public void OnPreprocessBuild(BuildReport report)
         {
+            Generator.IgnorePostProcess = true;
+            Generator.GenerateFull();
             CompilationPipeline.compilationStarted += CompilationPipelineOnCompilationStarted;
             CompilationPipeline.compilationFinished += CompilationPipelineOnCompilationFinished;
 
+            //PROSTART
             //Set building values.
             Configuration.ConfigurationData.IsBuilding = true;
 
@@ -128,6 +129,7 @@ namespace FishNet.Configuring
 
             //Write to file.
             Configuration.ConfigurationData.Write(false);
+            //PROEND
         }
         /* Solution for builds ending with errors and not triggering OnPostprocessBuild.
         * Link: https://gamedev.stackexchange.com/questions/181611/custom-build-failure-callback
@@ -147,27 +149,29 @@ namespace FishNet.Configuring
             CompilationPipeline.compilationStarted -= CompilationPipelineOnCompilationStarted;
             CompilationPipeline.compilationFinished -= CompilationPipelineOnCompilationFinished;
 
-            UnsetIsBuilding();
+            BuildingEnded();
         }
 
-        private void UnsetIsBuilding()
+        private void BuildingEnded()
         {
+            //PROSTART
             //Set building values.
             Configuration.ConfigurationData.IsBuilding = false;
             Configuration.ConfigurationData.IsHeadless = false;
             Configuration.ConfigurationData.IsDevelopment = false;
             //Write to file.
             Configuration.ConfigurationData.Write(false);
+            //PROEND
+
+            Generator.IgnorePostProcess = false;
         }
 
         public void OnPostprocessBuild(BuildReport report)
         {
             if (Configuration.ConfigurationData.IsBuilding)
-                UnsetIsBuilding();
+                BuildingEnded();
         }
 #endif
-        #endregion
-        //PROEND
     }
 
 }
